@@ -4,9 +4,9 @@ Repository for keeping track of code created during project on simulations of op
 
 All code is written in python, and the simulation of super-Clifford circuits is done using stim, a Clifford circuit simulator. This can be installed using the following command:
 
-`git checkout -b my-new-feature`
+`pip install stim`
 
-'pip install stim'
+
 
 
 
