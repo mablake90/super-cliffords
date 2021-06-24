@@ -1,0 +1,185 @@
+from typing import List, Collection
+import stim
+import numpy as np
+import gates
+import matplotlib.pyplot as plt
+import time
+import math
+import entropy
+
+
+def runFS1(N, T, M, l):
+    """
+    - Purpose: Run a fast scrambling circuit. Each time step this circuit applies C3 to half the qubits (randomly chosen and random couplings between qubits) and also applies Z.H to the remaining qubits. Compute operator entanglement of this circuit.
+    - Inputs:
+          - N: integer (Number of qubits).
+          - T: integer (Number of timesteps).
+          - M: integer (Number of repetitions to average over).
+          - k: integer (resolution i.e. how many times to compute operator entanglement)
+    - Outputs:
+          - v: array (Operator entanglement).
+          - w: array (Timesteps at which the operator entanglement was computed).
+    """
+
+    B = int(T/l)
+    v = np.zeros(B)
+    w = np.zeros(B)
+
+    cut = int(N/2)
+
+    for k in range(0, M):
+        s = stim.TableauSimulator()
+        for i in range(0, T):
+            s = gates.FS1Step(N, s)    
+            if (i % l) == 0:
+            	zs2 = entropy.sample_stabilizers(s)
+            	mat = entropy.binaryMatrix(zs2)
+            	b2 = entropy.getCutStabilizers(mat, cut)
+            	b3 = entropy.rows(b2)
+            	SA = entropy.gf2_rank(b3.copy()) - cut
+            	j = int(i/l)
+            	v[j] += SA/M
+  
+            else:
+                pass
+                
+    for i in range(0, B):
+        w[i] = i*l
+        
+    return v, w
+    
+    
+
+def runFS2(N, T, M, l):
+    """
+    - Purpose: Run a fast scrambling circuit. Step 1, apply Z.H to all qubits. Step 2, apply C3 to all qubits (with completely randomized couplings between the qubits). Compute operator entanglement of this circuit.
+    - Inputs:
+          - N: integer (Number of qubits).
+          - T: integer (Number of timesteps).
+          - M: integer (Number of repetitions to average over).
+          - k: integer (resolution i.e. how many times to compute operator entanglement)
+    - Outputs:
+          - v: array (Operator entanglement).
+          - w: array (Timesteps at which the operator entanglement was computed).
+    """
+
+    B = int(T/l)
+    v = np.zeros(B)
+    w = np.zeros(B)
+
+    cut = int(N/2)
+
+    for k in range(0, M):
+        s = stim.TableauSimulator()
+        for i in range(0, T):
+
+
+            if (i % 2) == 0:
+                s = gates.FS2StepE(N, s)
+            else:
+                s = gates.FS2StepO(N, s)
+                
+                    
+            if (i % l) == 0:
+            	zs2 = entropy.sample_stabilizers(s)
+            	mat = entropy.binaryMatrix(zs2)
+            	b2 = entropy.getCutStabilizers(mat, cut)
+            	b3 = entropy.rows(b2)
+            	SA = entropy.gf2_rank(b3.copy()) - cut
+            	j = int(i/l)
+            	v[j] += SA/M
+
+                
+                
+            else:
+                pass
+                
+    for i in range(0, B):
+        w[i] = i*l
+        
+    return v, w
+
+
+def runFS3(N, T, M, l):
+    """
+    - Purpose: Run a fast scrambling circuit. Each time step this circuit applies C3 to 3/4 of  the qubits (randomly chosen and random couplings between qubits) and also applies Z.H to the remaining qubits. Compute operator entanglement of this circuit.
+    - Inputs:
+          - N: integer (Number of qubits).
+          - T: integer (Number of timesteps).
+          - M: integer (Number of repetitions to average over).
+          - k: integer (resolution i.e. how many times to compute operator entanglement)
+    - Outputs:
+          - v: array (Operator entanglement).
+          - w: array (Timesteps at which the operator entanglement was computed).
+    """
+
+    B = int(T/l)
+    v = np.zeros(B)
+    w = np.zeros(B)
+
+    cut = int(N/2)
+
+    for k in range(0, M):
+        s = stim.TableauSimulator()
+        for i in range(0, T):
+            s = gates.FS3Step(N, s)    
+            if (i % l) == 0:
+            	zs2 = entropy.sample_stabilizers(s)
+            	mat = entropy.binaryMatrix(zs2)
+            	b2 = entropy.getCutStabilizers(mat, cut)
+            	b3 = entropy.rows(b2)
+            	SA = entropy.gf2_rank(b3.copy()) - cut
+            	j = int(i/l)
+            	v[j] += SA/M
+  
+            else:
+                pass
+                
+    for i in range(0, B):
+        w[i] = i*l
+        
+    return v, w
+
+
+
+
+def runFS3_Np(N, T, M, l, p):
+    """
+    - Purpose: Run a fast scrambling circuit.Each time step this circuit acts on N/p qubits. On the qubits it acts on, it applies Z.H on 1/4 of the qubits and C3 on the remaining ones.
+    - Inputs:
+          - N: integer (Number of qubits).
+          - T: integer (Number of timesteps).
+          - M: integer (Number of repetitions to average over).
+          - k: integer (resolution i.e. how many times to compute operator entanglement)
+          - p: integer (controls how much to slow down the circuit, so that each timestep the circuit acts on N/p qubits).
+    - Outputs:
+          - v: array (Operator entanglement).
+          - w: array (Timesteps at which the operator entanglement was computed).
+    """
+
+    B = int(T/l)
+    v = np.zeros(B)
+    w = np.zeros(B)
+
+    cut = int(N/2)
+
+    for k in range(0, M):
+        s = stim.TableauSimulator()
+        for i in range(0, T):
+            s = gates.FS3_NpStep(N, s, p)    
+            if (i % l) == 0:
+            	zs2 = entropy.sample_stabilizers(s)
+            	mat = entropy.binaryMatrix(zs2)
+            	b2 = entropy.getCutStabilizers(mat, cut)
+            	b3 = entropy.rows(b2)
+            	SA = entropy.gf2_rank(b3.copy()) - cut
+            	j = int(i/l)
+            	v[j] += SA/M
+  
+            else:
+                pass
+                
+    for i in range(0, B):
+        w[i] = i*l
+        
+    return v, w
