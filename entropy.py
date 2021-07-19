@@ -22,7 +22,7 @@ def sample_stabilizers(s):
     zs2 = np.array(zs)
     signs = [(zs[k].sign).real for k in range(n)]
     signs2 = np.array(signs)
-    return zs2
+    return zs2, signs2
     
     
 def binaryMatrix(zStabilizers):
@@ -151,19 +151,15 @@ def main():
 
     startTime = time.time()
 
+    N = 240 
+    T = 200
+    M = 1
+    l = 2
+    cut = int(N/3)
+    v, w = circuits.runFS3_Np(N, T, M, l, 10)
 
-    for i in range(0, 5):
-        N = 120 + i*60
-        T = 1000
-        M = 50
-        l = 1
-        cut = int(N/2)
-        v, w = circuits.runFS3_Np(N, T, M, l, 10)
+       # np.savez(f'FS3_Entropy_M50_N{N}.npz', v)
 
-        np.savez(f'FS3_Entropy_M50_N{N}.npz', v)
-
-
-    
 
     totTime = (time.time() - startTime)
     print('Execution time in seconds:' + str(totTime))
