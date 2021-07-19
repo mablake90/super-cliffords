@@ -6,12 +6,9 @@ import math
 import matplotlib.pyplot as plt
 
 
-#def log_fun(x, a):
-   # y = a*math.log(x)
-   # return y
 
 
-def ansatz(t, a):
+def ansatz(t, a, c):
     """
       - Purpose: Define the fitting ansatz which we will use to fit the entropy.
       - Inputs:
@@ -20,11 +17,11 @@ def ansatz(t, a):
       - Outputs:
             - S (array): Function to fit to the entropy.
     """
-    cut = 90
+    cut = 60
     size = np.size(t)
     S = np.zeros(size)
     for i in range(size):
-        S[i] = -math.log(2**(-cut) + 2**(-a*t[i]), 2)
+        S[i] = -math.log(2**(-cut+c) + 2**(-a*t[i]), 2)
         
     return S
 
@@ -41,7 +38,7 @@ Where cut is the number of spins in the subsystem we are considering. The inputs
     """
     
 
-    data1 = load('/home/at16718/Dropbox/Dropbox_Documents/Maths/Scrambling/FS3_Entropy_M50_N180.npz')
+    data1 = load('/home/at16718/Dropbox/Dropbox_Documents/Maths/Scrambling/FS3_Entropy_M50_N360.npz')
 
     
     lst = data1.files
@@ -50,30 +47,24 @@ Where cut is the number of spins in the subsystem we are considering. The inputs
 
     t = np.zeros(1000)
     for i in range(1000):
-        t[i] = i
+        t[i] = 5*i
 
-    N = 180
+    N = 120
     M = 50
-    cut = 90
+    cut = 60
     
     for item in lst:
         list1.append(data1[item])
-        print(list1)
         array1 = data1[item]
-        print(array1)
-   #     list2.append(data2[item])
-   #     array2 = np.array(list2)
-   #     list3.append(data3[item])
-   #     array3 = np.array(list3)
+ 
 
     popt, pcov = curve_fit(ansatz, t,  array1)
 
-    ansatz1 = ansatz(t, popt)
+    ansatz1 = ansatz(t, popt[0], popt[1])
 
     plt.plot(t, array1, color = 'blue', alpha = 0.7) 
     plt.plot(t, ansatz1, linestyle = '--', label = 'fit', color = 'red')
-  #  plt.scatter(t, array3, marker = '^', label = 'FS3', color = 'green')
-  #  plt.plot(t, log_fit)
+
 
     plt.xlabel('Time')
     plt.ylabel('S')
