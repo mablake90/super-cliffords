@@ -32,7 +32,7 @@ def runFS1(N, T, M, l):
         for i in range(0, T):
             s = gates.FS1Step(N, s)    
             if (i % l) == 0:
-            	zs2 = entropy.sample_stabilizers(s)
+            	zs2, signs2 = entropy.sample_stabilizers(s)
             	mat = entropy.binaryMatrix(zs2)
             	b2 = entropy.getCutStabilizers(mat, cut)
             	b3 = entropy.rows(b2)
@@ -81,7 +81,7 @@ def runFS2(N, T, M, l):
                 
                     
             if (i % l) == 0:
-            	zs2 = entropy.sample_stabilizers(s)
+            	zs2, signs2 = entropy.sample_stabilizers(s)
             	mat = entropy.binaryMatrix(zs2)
             	b2 = entropy.getCutStabilizers(mat, cut)
             	b3 = entropy.rows(b2)
@@ -124,7 +124,7 @@ def runFS3(N, T, M, l):
         for i in range(0, T):
             s = gates.FS3Step(N, s)    
             if (i % l) == 0:
-            	zs2 = entropy.sample_stabilizers(s)
+            	zs2, signs2 = entropy.sample_stabilizers(s)
             	mat = entropy.binaryMatrix(zs2)
             	b2 = entropy.getCutStabilizers(mat, cut)
             	b3 = entropy.rows(b2)
@@ -168,7 +168,7 @@ def runFS3_Np(N, T, M, l, p):
         for i in range(0, T):
             s = gates.FS3_NpStep(N, s, p)    
             if (i % l) == 0:
-            	zs2 = entropy.sample_stabilizers(s)
+            	zs2, signs2 = entropy.sample_stabilizers(s)
             	mat = entropy.binaryMatrix(zs2)
             	b2 = entropy.getCutStabilizers(mat, cut)
             	b3 = entropy.rows(b2)
@@ -183,3 +183,55 @@ def runFS3_Np(N, T, M, l, p):
         w[i] = i*l
         
     return v, w
+    
+def runLocInt(N, T, M, l, slow, cut):
+    """
+    - Purpose: Run a circuit which acts on O(N) qubits in each time step but only has local interactions. Step 1, apply Z.H to N/slow qubits. Step 2, apply SWAP to N/slow qubits (with completely randomized couplings between the qubits). Step 3, apply C3 to N/slow qubits. Compute operator entanglement of this circuit.
+    - Inputs:
+          - N: integer (Number of qubits).
+          - T: integer (Number of timesteps).
+          - M: integer (Number of repetitions to average over).
+          - l: integer (resolution i.e. how many times to compute operator entanglement)
+          - slow: integer (how much to slow down the action of the circuit, so only acting on N/slow qubits each timestep.
+          - cut: integer (where to make the cut for the entropy computation).
+    - Outputs:
+          - v: array (Operator entanglement).
+          - w: array (Timesteps at which the operator entanglement was computed).
+    """
+
+    B = int(T/l)
+    v = np.zeros(B)
+    w = np.zeros(B)
+
+
+    for k in range(0, M):
+        s = stim.TableauSimulator()
+        for i in range(0, T):
+            j = i-1
+
+            if (i % 2) == 0:
+                s = gates.LocInt_Step2(N, s, slow)
+                
+            else:
+                s = gates.LocInt_Step1(N,s, slow)
+                
+                     
+            if (i % l) == 0:
+            	zs2 = entropy.sample_stabilizers(s)
+            	mat = entropy.binaryMatrix(zs2)
+            	b2 = entropy.getCutStabilizers(mat, cut)
+            	b3 = entropy.rows(b2)
+            	SA = entropy.gf2_rank(b3.copy()) - cut
+            	j = int(i/l)
+            	v[j] += SA/M
+
+                  
+            else:
+                pass
+                
+    for i in range(0, B):
+        w[i] = i*l
+        
+    return v, w
+
+     

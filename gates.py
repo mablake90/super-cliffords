@@ -220,6 +220,78 @@ def FS3_NpStep(N, s, p):
      s.do(C3(r[0], r[Mq], r[2*Mq]))
      return s
      
+def LocInt_Step1(N, s, slow):
+     """ 
+      - Purpose: Apply a circuit corresponding to a single step in a random circuit. This random circuit acs on N/slow qubits at each step. On those qubits which it acts with Z.H on step 1 and then with C3 in step 2. C3 is applied with only local interactions.
+      
+     - Inputs:
+         - N (number of qubits): should be divisible by 12.
+         - s (stim.circuit): a stim circuit to evolve forward by one time step.
+         - slow (integer): controls how much to slow down the circuit. (e.g. so we only act on N/p qubits at each timestep).
+     - Outputs:
+         - s (stim.circuit): a stim circuit which has been evolved forward by one time step. 
+     """
 
+
+     Choose = int(N/(slow))
+     qubits = np.random.choice(N, size = Choose, replace=False)
+     qubits = qubits.tolist()
+     
+
+     for i in qubits:
+          s.do(ZH(i))
+
+     return s     
+  
+
+     
+
+def LocInt_Step2(N, s, slow):
+     """ 
+      - Purpose: Apply a circuit corresponding to a single step in a random circuit. This random circuit acs on N/slow qubits at each step. On those qubits which it acts with Z.H on step 1 and then with C3 in step 2. C3 is applied with only local interactions.
+      
+     - Inputs:
+         - N (number of qubits): should be divisible by 12.
+         - s (stim.circuit): a stim circuit to evolve forward by one time step.
+         - slow (integer): controls how much to slow down the circuit. (e.g. so we only act on N/p qubits at each timestep).
+     - Outputs:
+         - s (stim.circuit): a stim circuit which has been evolved forward by one time step. 
+     """
+
+
+
+     Tot = N-2
+     Choose = int(N/(3*slow))
+
+     qubits = np.random.choice(Tot, size = Choose, replace=False)
+     qubits = qubits.tolist()
+
+     for i in qubits:
+          k = random.randint(0,6)
+          if k == 0:
+               s.do(C3(i, i+1, i+2))
+          if k == 1:
+               s.do(C3(i, i+2, i+1))
+          if k == 2:
+               s.do(C3(i+1, i, i+2))
+          if k == 3:
+               s.do(C3(i+1, i+2, i))
+          if k == 4:
+               s.do(C3(i+2, i+1, i))
+          if k == 5:
+               s.do(C3(i+2, i, i+1))
+
+     return s     
+     
+
+
+def Id_Step(N, s):
+     
+
+    c = stim.Circuit()
+    c.append_operation("I", [N-1])
+    s.do(c)
+
+    return s
 
      
