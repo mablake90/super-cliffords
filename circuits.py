@@ -3,7 +3,6 @@ import stim
 import numpy as np
 import gates
 import matplotlib.pyplot as plt
-import time
 import math
 import entropy
 
