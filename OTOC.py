@@ -4,16 +4,17 @@ import gates
 import entropy
 import time
 import matplotlib.pyplot as plt
+import random
 
 
-def RREF_binary(A):
-    """Purpose: Converts a matrix to reduced row echelon form (RREF) by Gaussian elimination over gf2.
+def REF_binary(A, signs, N):
+    """Purpose: Take a binary matrix and reduce it to Row echelon form (REF) over gf2. While also updating the signs that go with it using the appropriate rowsum operation.
+       Inputs: - A: binary matrix (size N x 2N).
+               - signs: a binary vector (corresponding to the signs).
+               - N: an integer, the size of the vector signs.
+       Outputs: - A: binary matrix in REF.
+                - signs: the correct signs to accompany this."""
     
-    - Inputs: 
-         - A (np.array): a binary matrix to be reduced to RREF
-    -Outputs:
-         - A (np.array): a binary matrix in RREF.    
-    """
     n_rows, n_cols = A.shape
 
     # Compute row echelon form (REF)
@@ -35,6 +36,10 @@ def RREF_binary(A):
             
         # otherwise, swap current row with the pivot row
         A[[current_row, pivot_row]] = A[[pivot_row, current_row]]
+        a = signs[current_row]
+        signs[current_row] = signs[pivot_row]
+        signs[pivot_row] = a
+        
 
         pivot_row = current_row
         current_row += 1
@@ -45,33 +50,62 @@ def RREF_binary(A):
             # a non-zero entry in this current column 
             if A[i, j] == 1:
                 A[i] = (A[i] +  A[pivot_row]) % 2 # subtracting is same as adding in GF(2)
+                signs[i] = row_sum(A[i], A[pivot_row], signs[i], signs[pivot_row], N)
                 
               
-    # Compute reduced row echelon form (RREF)
-    # in the RREF form, there is only one non-zero entry in a column. 
-    for i in reversed(range(current_row)):
-        # Find pivot
-        pivot_col = 0
-        
-        # find the column with the first non-zero entry. 
-        while pivot_col < n_cols and A[i, pivot_col]==0:
-            pivot_col += 1
-        if pivot_col == n_cols:
-            continue  # Skip this all-zero row
-    
-        # Eliminate this column in all the rows above
-        for j in range(i):
-            if A[j, pivot_col] == 1:
-                A[j] = (A[j] +  A[i]) % 2
+    return A, signs
 
-    return A
+
+def g(x1, z1, x2, z2):
+    "Purpose: Computes the function g needed for the rowsum operation.
+     Inputs: -x1, z1, x2, z2 all are a binary digit.
+     Outputs: -g: also a binary digit."
+
+    if (x1 ==0) and (z1 == 0):
+        g = 0
+    if (x1 == 0) and (z1 == 1):
+        g = x2*(1 - 2*z2)
+    if (x1 == 1) and (z1 == 0):
+        g = z2*(2*x2 -1)
+    if (x1 == 1) and (z1 == 1):
+        g = z2 - x2
+        
+    return g    
+
+
+def row_sum(h, i, rh, ri, N):
+    """
+    Purpose: Computes the full rowsum operation.
+    Inputs: - h: a vector (the row that is being summed into).
+            - i: a vector (the row that we are summing to h).
+            - rh: binary digit (the sign of h).
+            - ri: binary digit (the sign of i).
+            - N: an integer (the size of the vector).
+    Outputs: - rh: the updated sign of h, using the rowsum operation.
+    """
+
+    m = np.size(h)
+
+    k = 0
+    for j in range(N):
+        k += g(i[j], i[j+N], h[j], h[j+N])
+
+    f = 2*rh +2*ri + k
+    
+    if (f % 4) == 0:
+        rh = 0
+    else:
+        rh = 1
+        
+    return rh    
+
+
+    
 
 def xs(binMat):
-    """Purpose: Takes a matrix of size N x 2N and returns a matrix of size N x N (the first half of the matrix corresponding to the xs.
-    - Inputs: 
-         - binMat (np.array): a N x 2N binary matrix to be reduced to RREF.
-    -Outputs:
-         - xs (np.array): a binary matrix in RREF.    
+    """Purpose: Takes a stabilizer matrix and just returns the half corresponding to the xs.
+       Inputs: -binMat: a binary N x 2N matrix.
+       Outputs: -xs: a binary N x N matrix (just the xs).
     """
 
     N = len(binMat)
@@ -81,6 +115,20 @@ def xs(binMat):
     return xs
 
 
+def small_zs(binMat, size2, N):
+    """
+    Purpose: Takes a full binary matrix and returns only a small corner of the zs.
+    Inputs: -binMat: binary matrix.
+            -size2: a number (the size we want to cut it down to).
+            -N: current size of matrix.
+    Outputs: -small_zs: the small matrix we have cut out.
+
+
+    """
+
+    small_zs = np.zeros((size2, N))
+    small_zs[:,:] = binMat[N-size2:, N:]
+    return small_zs
 
 
 def OTOC_FS3_Np(N, T, rep, res, slow, Op):
@@ -94,85 +142,122 @@ def OTOC_FS3_Np(N, T, rep, res, slow, Op):
                - res: integer (resolution - i.e. how often the OTOC gets computed).
                - slow: integer (determines how much we slow down the action of the circuit).
                - Op: stim.TableauSimulator (gives a new operator which should be a super-Clifford and which we will use for computing the OTOC
-        - Outputs: ???
+        - Outputs: - v: a vector (the result of the OTOC calculation).
+                   - w: a vector (the result of the time evolution).
 
 """
     Size = int(T/res) #specify size of output vectors.
     v = np.zeros(Size)
     w = np.zeros(Size)
     for m in range(Size):
-        w[m] = m
-
+        w[m] = m*res
 
     for k in range(0, rep):
         s = stim.TableauSimulator()
         for i in range(0, T):
-            s = gates.Id_Step(N,s)
+            s = gates.FS3_NpStep(N, s, slow)
             if (i % res) == 0:
                 tableau1: stim.Tableau = s.current_inverse_tableau()**-1
                 n1 = len(tableau1)
                 tableau2: stim.Tableau = Op.current_inverse_tableau()**-1
                 n2 = len(tableau2)
                 tableau3: stim.Tableau = s.current_inverse_tableau()
-                tableau_tot: stim.Tableau = tableau3*(tableau2*tableau1)
-
+                tableau_tot: stim.Tableau = (tableau3*tableau2)*tableau1
                 n = len(tableau_tot)
                 zs = [tableau_tot.z_output(k) for k in range(n)]
                 zs2 = np.array(zs)
                 signs = [(zs[k].sign).real for k in range(n)]
                 signs2 = np.array(signs)
                 bMat = entropy.binaryMatrix(zs2)
-                RREF = RREF_binary(bMat)
-                xs1 = xs(RREF)
+            
+                signs3 = entropy.convert_signs(signs2)
+               
+                REF, signs3 = REF_binary(bMat, signs3, N)
+            
+
+                
+                xs1 = xs(REF)
                 rows = entropy.rows(xs1)
                 rank = entropy.gf2_rank(rows)
-                                
-                v[int(i/res)] +=(2**(-(rank)/2))/rep        
+                size2 = N - rank
+            
+
+                small = small_zs(REF, size2, N)
+
+                REF2 = small #RREF_binary(small)
+                shape = np.shape(REF2)
+
+                signs4 = signs3[rank:]
+                Ans = 0
+
+                for k in range(size2):
+                    if (signs4[k] == 1):
+                          Ans = 1
+
+                        
+                if (Ans == 1):
+                    v[int(i/res)] += 0
+                else:    
+                    v[int(i/res)] +=(2**(-(rank)/2))/rep        
                     
     return v, w           
 
 def Op(N):
-    """ 
-    Purpose: Create an operator to act as V(0) in the OTOC calculation.
-    - Inputs: 
-            - N (integer): length of the chain, is needed to make sure that tableau multiplication works.
-    - Outputs: 
-            - s (stim.TableauSimulator): a stim Tableau representation of the desired V(0).
-  
+    """
+    Purpose: Generate an operator which will act as V(0) in the OTOC calculation.
+    Inputs: - N: an integer, the size of the chain of spins.
+    Outputs: - s: a stim circuit with V(0) on it.
     """
     s = stim.TableauSimulator()
-         
+
+    c1 = stim.Circuit()
 
     c = stim.Circuit()
+    r = random.randint(0, N-3)
     c.append_operation("I", [N-1])
-    c.append_operation("H", [1])
+    c.append_operation("I", [0])
     s.do(c)
+    s.do(gates.ZH(r))
+    s.do(gates.C3(r, r+1, r+2))
 
     return s
 
     
 
-
 def main():
-    startTime = time.time()
-                   
+    """
+    Below to run the OTOC calculation, first set V(0) in the Op(N) function, above. Then fix the following parameter: N (size of chain), T (number of timesteps), rep (number of repititions), res (resolution), slow (how much to slow down the fast scrambling circuit).
+    """
+
+
     
+    startTime = time.time()
+
+    for i in range(0, 10):
+        for k in range(0, 4):
+            
+            N = 120 + k*120
+            print(N)
+            T = 80
+            rep = 200
+            res = 2
+            slow = 10
+            Op1 = Op(N)
+            v, w = OTOC_FS3_Np(N, T, rep, res, slow, Op1)
+            np.savez(f'random_C3TT_OTOC_FS3_N{N}_slow{slow}_rep{rep}_iteration{i}.npz', v)
+
 
     N = 120
-    T = 300
-    rep = 1
-    res = 1
-    slow = 30
+    T = 80
+    rep = 500
+    res = 2
+    slow = 2
     Op1 = Op(N)
-
-
-
     v, w = OTOC_FS3_Np(N, T, rep, res, slow, Op1)
 
     totTime = (time.time() - startTime)
     print('Execution time in seconds:' + str(totTime))
-    
-    
+
 
                  	      
     plt.plot(w, v)
