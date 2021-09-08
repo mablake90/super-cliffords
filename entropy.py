@@ -153,10 +153,10 @@ def main():
 
     N = 240 
     T = 200
-    M = 1
-    l = 2
+    rep = 1
+    res = 2
     cut = int(N/3)
-    v, w = circuits.runFS3_Np(N, T, M, l, 10)
+    v, w = circuits.runFS3_Np(N, T, rep, res, 10)
 
        # np.savez(f'FS3_Entropy_M50_N{N}.npz', v)
 
