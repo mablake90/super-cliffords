@@ -26,11 +26,22 @@ def ansatz(t, a, c):
     return S
 
  
+def ansatz2(t, a):
+
+    cut = 40
+    N = 120
+    size = np.size(t)
+    S = np.zeros(size)
+    for i in range(size):
+        S[i] = cut - N*math.exp(-a*t[i])
+         
+    return S
+ 
 
 
 def main():
     """
-    This can be used to fit the entropy using the functional form of the entropy. The fitting ansatz for the entropy is given by the equation:
+    This can be used to fit the entropy using the functional form of the entropy for a system with local interactions only. The fitting ansatz for the entropy is given by the equation:
 
 2^(-S(t)) = 2^(-cut) + 2^(-a*t)
      
@@ -38,29 +49,31 @@ Where cut is the number of spins in the subsystem we are considering. The inputs
     """
     
 
-    data1 = load('/home/at16718/Dropbox/Dropbox_Documents/Maths/Scrambling/FS3_Entropy_M50_N360.npz')
+    data1 = load('/home/at16718/Dropbox/Dropbox_Documents/Maths/Scrambling/Entropy_FS3_ThirdChainCut_N120_T500.npz')
 
     
     lst = data1.files
     list1 = []
 
 
-    t = np.zeros(1000)
-    for i in range(1000):
-        t[i] = 5*i
+    t = np.zeros(225)
+    for i in range(225):
+        t[i] = 40 +2*i
 
-    N = 120
+    N = 360
     M = 50
-    cut = 60
+    cut = 120
     
     for item in lst:
         list1.append(data1[item])
         array1 = data1[item]
  
-
+    array1 = array1[25:]
+ 
+ 
     popt, pcov = curve_fit(ansatz, t,  array1)
 
-    ansatz1 = ansatz(t, popt[0], popt[1])
+    ansatz1 = ansatz2(t, popt[0])
 
     plt.plot(t, array1, color = 'blue', alpha = 0.7) 
     plt.plot(t, ansatz1, linestyle = '--', label = 'fit', color = 'red')
