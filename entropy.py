@@ -22,7 +22,7 @@ def sample_stabilizers(s):
     zs2 = np.array(zs)
     signs = [(zs[k].sign).real for k in range(n)]
     signs2 = np.array(signs)
-    return zs2, signs2
+    return zs2
     
     
 def binaryMatrix(zStabilizers):
@@ -50,7 +50,20 @@ def binaryMatrix(zStabilizers):
         r += 1
 
     return binaryMatrix
+
+def convert_signs(signs):
     
+    n = np.size(signs)
+    for r in range(n):    
+        if (signs[r] == 1):
+            signs[r] = 0
+        else:
+            signs[r] = 1
+        
+    return signs
+
+
+
 def getCutStabilizers(binaryMatrix, cut):
     """
         - Purpose: Return only the part of the binary matrix that corresponds to the qubits we want to consider for a bipartition.
@@ -151,23 +164,38 @@ def main():
 
     startTime = time.time()
 
-    N = 240 
+##    for i in range(0, 4):
+
+##        N = 120 + 60*i
+ ##       print(N)
+  ##      T = 2000
+  ##      M = 50
+ ##       res = 2
+  ##      cut = int(N/3)
+ ##       slow = 1
+ ##       v, w = circuits.runLocInt(N, T, M, res, slow, cut)
+ ##       np.savez(f'Entropy_LocInt_ThirdChainCut_N{N}_T{T}.npz', v)
+        
+        
+        
+            
+
+    N = 120
     T = 200
-    rep = 1
+    M = 10
     res = 2
     cut = int(N/3)
-    v, w = circuits.runFS3_Np(N, T, rep, res, 10)
-
-       # np.savez(f'FS3_Entropy_M50_N{N}.npz', v)
-
-
+    slow = 1
+#    v, w = circuits.runLocInt(N, T, M, res, slow, cut)
+    v, w = circuits.runFS3_Np(N, T, M, res, slow, cut)
+    
     totTime = (time.time() - startTime)
     print('Execution time in seconds:' + str(totTime))
     
     
-    A = np.min(np.argwhere(v > (cut - 2)))
-    B = w[A]
-    print(f'The Operator entanglement saturates after T={B} timesteps.')
+   # A = np.min(np.argwhere(v > (cut - 2)))
+   # B = w[A]
+   # print(f'The Operator entanglement saturates after T={B} timesteps.')
                  	      
     plt.plot(w, v)
     plt.xlabel('Time')
