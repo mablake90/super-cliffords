@@ -69,10 +69,13 @@ def Rand1Step(N, s):
          - s (stim.circuit): a stim circuit which has been evolved forward by one time step.     
     
     """
-    r1 = random.randint(0, N)
+    r1 = random.randint(0, N-1)
     s.do(ZH(r1))
+    c = stim.Circuit()
+    c.append_operation("I", [N-1])
+    s.do(c) 
     
-    r2 = random.randint(0, N-2)
+    r2 = random.randint(0, N-3)
     r3 = random.randint(0,5)
     if r3 == 0:
        s.do(C3(r2, r2+1, r2+2))
@@ -86,7 +89,7 @@ def Rand1Step(N, s):
        s.do(C3(r2+2, r2+1, r2))
     else:
        s.do(C3(r2+2, r2, r2+1))
-                    
+                     
     return s
     
     
@@ -205,11 +208,12 @@ def FS3_NpStep(N, s, p):
      """
 
 
-     r = [i for i in range(N)]
+     r = [i for i in range(N-1)]
      random.shuffle(r)
 
-     Mp = int(N/ p)
-     Mq = int(N/(p*4))
+     Mp = int(N/ p - 1)
+     
+     Mq = int(N/(p*4) -1)
 
      for i in range(3*Mq, Mp):
           s.do(ZH(r[i]))
@@ -218,20 +222,15 @@ def FS3_NpStep(N, s, p):
           s.do(C3(r[i], r[2*i], r[3*i]))
 
      s.do(C3(r[0], r[Mq], r[2*Mq]))
+
+
+     c = stim.Circuit()
+     c.append_operation("I", [N-1])
+     s.do(c)
      return s
      
-def LocInt_Step1(N, s, slow):
-     """ 
-      - Purpose: Apply a circuit corresponding to a single step in a random circuit. This random circuit acs on N/slow qubits at each step. On those qubits which it acts with Z.H on step 1 and then with C3 in step 2. C3 is applied with only local interactions.
-      
-     - Inputs:
-         - N (number of qubits): should be divisible by 12.
-         - s (stim.circuit): a stim circuit to evolve forward by one time step.
-         - slow (integer): controls how much to slow down the circuit. (e.g. so we only act on N/p qubits at each timestep).
-     - Outputs:
-         - s (stim.circuit): a stim circuit which has been evolved forward by one time step. 
-     """
 
+def LocInt_Step1(N, s, slow):
 
      Choose = int(N/(slow))
      qubits = np.random.choice(N, size = Choose, replace=False)
@@ -240,30 +239,27 @@ def LocInt_Step1(N, s, slow):
 
      for i in qubits:
           s.do(ZH(i))
-
+     c = stim.Circuit()
+     c.append_operation("I", [N-1])
+     s.do(c)
+     
      return s     
   
 
      
 
 def LocInt_Step2(N, s, slow):
-     """ 
-      - Purpose: Apply a circuit corresponding to a single step in a random circuit. This random circuit acs on N/slow qubits at each step. On those qubits which it acts with Z.H on step 1 and then with C3 in step 2. C3 is applied with only local interactions.
-      
-     - Inputs:
-         - N (number of qubits): should be divisible by 12.
-         - s (stim.circuit): a stim circuit to evolve forward by one time step.
-         - slow (integer): controls how much to slow down the circuit. (e.g. so we only act on N/p qubits at each timestep).
-     - Outputs:
-         - s (stim.circuit): a stim circuit which has been evolved forward by one time step. 
-     """
 
 
-
-     Tot = N-2
      Choose = int(N/(3*slow))
 
-     qubits = np.random.choice(Tot, size = Choose, replace=False)
+     div3 =[]
+     for i in range(N):
+          if i % 3 == 0:
+               div3.append(i)
+     div3a = np.array(div3)
+
+     qubits = np.random.choice(div3a, size = Choose, replace = False)
      qubits = qubits.tolist()
 
      for i in qubits:
@@ -280,10 +276,61 @@ def LocInt_Step2(N, s, slow):
                s.do(C3(i+2, i+1, i))
           if k == 5:
                s.do(C3(i+2, i, i+1))
-
-     return s     
+     c = stim.Circuit()
+     c.append_operation("I", [N-1])
+     s.do(c)
      
+     return s
 
+def LocInt_Step3(N, s, slow):
+
+     Choose = int(N/(2*slow))
+
+     div2 = []
+     for i in range(N):
+          if i % 2 == 0:
+               div2.append(i)
+     div2a = np.array(div2)
+
+     qubits = np.random.choice(div2a, size = Choose, replace = False)
+     qubits = qubits.tolist()
+
+     for i in qubits:
+          s.do(SWP(i, i+1))
+     c = stim.Circuit()
+     c.append_operation("I", [N-1])
+
+     s.do(c)
+
+     return s
+
+def LocInt_Step4(N, s, slow):
+
+     Choose = int((N-1)/(2*slow) -1)
+
+     ndiv2 = []
+     for i in range(N-1):
+          if i % 2 == 1:
+               ndiv2.append(i)
+     ndiv2a = np.array(ndiv2)
+
+     qubits = np.random.choice(ndiv2a, size = Choose, replace = False)
+     qubits = qubits.tolist()
+
+     for i in qubits:
+          s.do(SWP(i, i+1))
+
+     c = stim.Circuit()
+     c.append_operation("I", [N-1])
+
+     s.do(c)
+
+     return s
+
+     
+     
+     
+     
 
 def Id_Step(N, s):
      
@@ -291,7 +338,35 @@ def Id_Step(N, s):
     c = stim.Circuit()
     c.append_operation("I", [N-1])
     s.do(c)
-
     return s
 
+
+def Local_Scrambling1(N, s):
+
+     r = random.randint(0, N-2)
+     r1 = random.randint(0,1)
+
+
+     c = stim.Circuit()
+     c.append_operation("I", [N-1])
+
+     if r1 == 0:
+          c.append_operation("CNOT", [r, r+1])
+     else:
+          c.append_operation("CNOT", [r+1, r])
+
+
+     s.do(c)
+
+     return s
      
+     
+     
+def Local_Scrambling1_Init(N,s):
+     
+     c = stim.Circuit()
+     c.append_operation("H", [0])
+     s.do(c)
+
+     return s
+          
