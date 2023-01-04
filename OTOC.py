@@ -8,13 +8,7 @@ import random
 
 
 def REF_binary(A, signs, N):
-    """Purpose: Take a binary matrix and reduce it to Row echelon form (REF) over gf2. While also updating the signs that go with it using the appropriate rowsum operation.
-       Inputs: - A: binary matrix (size N x 2N).
-               - signs: a binary vector (corresponding to the signs).
-               - N: an integer, the size of the vector signs.
-       Outputs: - A: binary matrix in REF.
-                - signs: the correct signs to accompany this."""
-    
+    """Converts a matrix to row echelon form (REF)"""
     n_rows, n_cols = A.shape
 
     # Compute row echelon form (REF)
@@ -57,9 +51,7 @@ def REF_binary(A, signs, N):
 
 
 def g(x1, z1, x2, z2):
-    "Purpose: Computes the function g needed for the rowsum operation.
-     Inputs: -x1, z1, x2, z2 all are a binary digit.
-     Outputs: -g: also a binary digit."
+    "Computes the function g needed for the rowsum operation."
 
     if (x1 ==0) and (z1 == 0):
         g = 0
@@ -74,15 +66,6 @@ def g(x1, z1, x2, z2):
 
 
 def row_sum(h, i, rh, ri, N):
-    """
-    Purpose: Computes the full rowsum operation.
-    Inputs: - h: a vector (the row that is being summed into).
-            - i: a vector (the row that we are summing to h).
-            - rh: binary digit (the sign of h).
-            - ri: binary digit (the sign of i).
-            - N: an integer (the size of the vector).
-    Outputs: - rh: the updated sign of h, using the rowsum operation.
-    """
 
     m = np.size(h)
 
@@ -103,10 +86,6 @@ def row_sum(h, i, rh, ri, N):
     
 
 def xs(binMat):
-    """Purpose: Takes a stabilizer matrix and just returns the half corresponding to the xs.
-       Inputs: -binMat: a binary N x 2N matrix.
-       Outputs: -xs: a binary N x N matrix (just the xs).
-    """
 
     N = len(binMat)
     xs = np.zeros((N, N))
@@ -116,15 +95,6 @@ def xs(binMat):
 
 
 def small_zs(binMat, size2, N):
-    """
-    Purpose: Takes a full binary matrix and returns only a small corner of the zs.
-    Inputs: -binMat: binary matrix.
-            -size2: a number (the size we want to cut it down to).
-            -N: current size of matrix.
-    Outputs: -small_zs: the small matrix we have cut out.
-
-
-    """
 
     small_zs = np.zeros((size2, N))
     small_zs[:,:] = binMat[N-size2:, N:]
@@ -142,8 +112,7 @@ def OTOC_FS3_Np(N, T, rep, res, slow, Op):
                - res: integer (resolution - i.e. how often the OTOC gets computed).
                - slow: integer (determines how much we slow down the action of the circuit).
                - Op: stim.TableauSimulator (gives a new operator which should be a super-Clifford and which we will use for computing the OTOC
-        - Outputs: - v: a vector (the result of the OTOC calculation).
-                   - w: a vector (the result of the time evolution).
+        - Outputs: ???
 
 """
     Size = int(T/res) #specify size of output vectors.
@@ -155,7 +124,11 @@ def OTOC_FS3_Np(N, T, rep, res, slow, Op):
     for k in range(0, rep):
         s = stim.TableauSimulator()
         for i in range(0, T):
-            s = gates.FS3_NpStep(N, s, slow)
+            if i == 0:
+                s = gates.Id_Step(N, s)
+            else:     
+                s = gates.FS3_NpStep(N, s, slow)
+                
             if (i % res) == 0:
                 tableau1: stim.Tableau = s.current_inverse_tableau()**-1
                 n1 = len(tableau1)
@@ -202,12 +175,165 @@ def OTOC_FS3_Np(N, T, rep, res, slow, Op):
                     
     return v, w           
 
+
+
+def OTOC_Rand1(N, T, rep, res, Op):
+    """
+        - Purpose: Run a slow scrambling O(1) circuit with local interactions and use it to compute an OTOC. Each time step this circuit acts on 3 qubits. On the first qubit it acts with Z.H and then it acts with C3 on the three qubits, randomizing which qubit is control. In order to compute the OTOC one needs to introduce another operator, this is given by Op.
+
+        - Inputs: 
+               - N: integer (number of qubits).
+               - T: integer (number of timesteps).
+               - rep: integer (number of repetitions).
+               - res: integer (resolution - i.e. how often the OTOC gets computed).
+               - Op: stim.TableauSimulator (gives a new operator which should be a super-Clifford and which we will use for computing the OTOC
+        - Outputs: ???
+
+"""
+    Size = int(T/res) #specify size of output vectors.
+    v = np.zeros(Size)
+    w = np.zeros(Size)
+    for m in range(Size):
+        w[m] = m*res
+
+    for k in range(0, rep):
+        s = stim.TableauSimulator()
+        for i in range(0, T):
+            if i == 0:
+                s = gates.Id_Step(N, s)
+            else:
+                s = gates.Rand1Step(N, s)
+            if (i % res) == 0:
+                tableau1: stim.Tableau = s.current_inverse_tableau()**-1
+                n1 = len(tableau1)
+                tableau2: stim.Tableau = Op.current_inverse_tableau()**-1
+                n2 = len(tableau2)
+                tableau3: stim.Tableau = s.current_inverse_tableau()
+                tableau_tot: stim.Tableau = (tableau3*tableau2)*tableau1
+                n = len(tableau_tot)
+                zs = [tableau_tot.z_output(k) for k in range(n)]
+                zs2 = np.array(zs)
+                signs = [(zs[k].sign).real for k in range(n)]
+                signs2 = np.array(signs)
+                bMat = entropy.binaryMatrix(zs2)
+            
+                signs3 = entropy.convert_signs(signs2)
+               
+                REF, signs3 = REF_binary(bMat, signs3, N)
+            
+
+                
+                xs1 = xs(REF)
+                rows = entropy.rows(xs1)
+                rank = entropy.gf2_rank(rows)
+                size2 = N - rank
+            
+
+                small = small_zs(REF, size2, N)
+
+                REF2 = small #RREF_binary(small)
+                shape = np.shape(REF2)
+
+                signs4 = signs3[rank:]
+                Ans = 0
+
+                for k in range(size2):
+                    if (signs4[k] == 1):
+                          Ans = 1
+
+                        
+                if (Ans == 1):
+                    v[int(i/res)] += 0
+                else:    
+                    v[int(i/res)] +=(2**(-(rank)/2))/rep        
+                    
+    return v, w    
+
+
+
+def OTOC_LocInt(N, T, rep, res, slow, Op):
+    """
+        - Purpose: Run a slow scrambling O(N) circuit with local interactions and use it to compute an OTOC. Each time step this circuit acts on N/slow qubits. On even time steps it acts on N/slow qubits with Z.H on odd timesteps it acts on N/slow qubits with C3 (randomizing which qubit is control) - but the C3 gate is constrained to be local i.e. nearest neighbour. For simplicity, we will go two timesteps at a time. 
+
+        - Inputs: 
+               - N: integer (number of qubits).
+               - T: integer (number of timesteps).
+               - rep: integer (number of repetitions).
+               - res: integer (resolution - i.e. how often the OTOC gets computed).
+               - Op: stim.TableauSimulator (gives a new operator which should be a super-Clifford and which we will use for computing the OTOC
+        - Outputs: ???
+
+"""
+    Size = int(T/res) #specify size of output vectors.
+    v = np.zeros(Size)
+    w = np.zeros(Size)
+    for m in range(Size):
+        w[m] = m*res
+
+    for k in range(0, rep):
+        s = stim.TableauSimulator()
+        for i in range(0, T):
+            if i == 0:
+                s = gates.Id_Step(N, s)
+            else:
+                s = gates.LocInt_Step1(N, s, slow)
+                s = gates.LocInt_Step2(N, s, slow)
+
+
+            if i % 2 == 0:
+                s = gates.LocInt_Step3(N, s, slow)
+
+            else:
+                s = gates.LocInt_Step4(N, s, slow)
+                
+            if (i % res) == 0:
+                tableau1: stim.Tableau = s.current_inverse_tableau()**-1
+                n1 = len(tableau1)
+                tableau2: stim.Tableau = Op.current_inverse_tableau()**-1
+                n2 = len(tableau2)
+                tableau3: stim.Tableau = s.current_inverse_tableau()
+                tableau_tot: stim.Tableau = (tableau3*tableau2)*tableau1
+                n = len(tableau_tot)
+                zs = [tableau_tot.z_output(k) for k in range(n)]
+                zs2 = np.array(zs)
+                signs = [(zs[k].sign).real for k in range(n)]
+                signs2 = np.array(signs)
+                bMat = entropy.binaryMatrix(zs2)
+            
+                signs3 = entropy.convert_signs(signs2)
+               
+                REF, signs3 = REF_binary(bMat, signs3, N)
+            
+
+                
+                xs1 = xs(REF)
+                rows = entropy.rows(xs1)
+                rank = entropy.gf2_rank(rows)
+                size2 = N - rank
+            
+
+                small = small_zs(REF, size2, N)
+
+                REF2 = small #RREF_binary(small)
+                shape = np.shape(REF2)
+
+                signs4 = signs3[rank:]
+                Ans = 0
+
+                for k in range(size2):
+                    if (signs4[k] == 1):
+                          Ans = 1
+
+                        
+                if (Ans == 1):
+                    v[int(i/res)] += 0
+                else:    
+                    v[int(i/res)] +=(2**(-(rank)/2))/rep        
+                    
+    return v, w    
+
+
 def Op(N):
-    """
-    Purpose: Generate an operator which will act as V(0) in the OTOC calculation.
-    Inputs: - N: an integer, the size of the chain of spins.
-    Outputs: - s: a stim circuit with V(0) on it.
-    """
     s = stim.TableauSimulator()
 
     c1 = stim.Circuit()
@@ -217,7 +343,8 @@ def Op(N):
     c.append_operation("I", [N-1])
     c.append_operation("I", [0])
     s.do(c)
-    s.do(gates.ZH(r))
+    s.do(gates.ZH(r+1))
+    s.do(gates.ZH(r+2))
     s.do(gates.C3(r, r+1, r+2))
 
     return s
@@ -225,46 +352,33 @@ def Op(N):
     
 
 def main():
-    """
-    Below to run the OTOC calculation, first set V(0) in the Op(N) function, above. Then fix the following parameter: N (size of chain), T (number of timesteps), rep (number of repititions), res (resolution), slow (how much to slow down the fast scrambling circuit).
-    """
-
-
-    
     startTime = time.time()
 
-    for i in range(0, 10):
-        for k in range(0, 4):
-            
-            N = 120 + k*120
-            print(N)
-            T = 80
-            rep = 200
-            res = 2
-            slow = 10
-            Op1 = Op(N)
-            v, w = OTOC_FS3_Np(N, T, rep, res, slow, Op1)
-            np.savez(f'random_C3TT_OTOC_FS3_N{N}_slow{slow}_rep{rep}_iteration{i}.npz', v)
 
-
-    N = 120
-    T = 80
-    rep = 500
-    res = 2
+    N = 120 
+    T = 100
+    rep = 10
+    res = 1
     slow = 2
     Op1 = Op(N)
-    v, w = OTOC_FS3_Np(N, T, rep, res, slow, Op1)
+#    v1, w1 = OTOC_LocInt(N, T, rep, res, slow, Op1)
+#    v2, w2 = OTOC_Rand1(N, T, rep, res, Op1)
+    v3, w3 = OTOC_FS3_Np(N, T, rep, res, slow, Op1)
+
+    
+        
+
 
     totTime = (time.time() - startTime)
     print('Execution time in seconds:' + str(totTime))
+    
 
 
-                 	      
-    plt.plot(w, v)
+            	      
+    plt.plot(w3, v3)
     plt.xlabel('Time')
     plt.ylabel('OTOC')
     plt.title(f'OTOC for N = {N}')
-    
     plt.show()  
     
 
