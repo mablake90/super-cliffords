@@ -3,6 +3,11 @@ import stim
 import numpy as np
 import random
 
+"""
+This file contains gates which form the building blocks of the circuits that are used to compute the entropy and OTOC. The gate set we use are ZH, SWAP, C3. These gates are then organized into single timesteps of various circuits, which can then be easily run.
+
+"""
+
 
 def C3(i, j, k):
      """
@@ -189,36 +194,35 @@ def FS3Step(N, s):
           s.do(C3(r[i], r[2*i], r[3*i]))
 
      s.do(C3(r[0], r[M4], r[2*M4]))
-     return s
-
-
 
      return s
 
-def FS3_NpStep(N, s, p):
+
+
+def FS3_NpStep(N, s, slow):
      """
      - Purpose: Apply a circuit corresponding to one single step of a random circuit. This random circuit acts on N/p qubits each step. On those qubits which it acts on, it acts as Z.H on 1/4 of them and then as C3 on the rest.
     
      - Inputs:
          - N (number of qubits): should be divisible by 12.
          - s (stim.circuit): a stim circuit to evolve forward by one time step.
-         - p (integer): controls how much to slow down the circuit. (e.g. so we only act on N/p qubits at each timestep).
+         - slow (integer): controls how much to slow down the circuit. (e.g. so we only act on N/p qubits at each timestep).
      - Outputs:
          - s (stim.circuit): a stim circuit which has been evolved forward by one time step. 
      """
 
 
-     r = [i for i in range(N-1)]
+     r = [i for i in range(N-1)] #Randomly chooses which qubits to act on with the gates.
      random.shuffle(r)
 
-     Mp = int(N/ p - 1)
+     Mp = int(N/slow - 1)
      
-     Mq = int(N/(p*4) -1)
+     Mq = int(N/(slow*4) -1)
 
-     for i in range(3*Mq, Mp):
+     for i in range(3*Mq, Mp): #Apply ZH
           s.do(ZH(r[i]))
 
-     for i in range(1, Mq):
+     for i in range(1, Mq):  #Apply C3
           s.do(C3(r[i], r[2*i], r[3*i]))
 
      s.do(C3(r[0], r[Mq], r[2*Mq]))
@@ -227,17 +231,27 @@ def FS3_NpStep(N, s, p):
      c = stim.Circuit()
      c.append_operation("I", [N-1])
      s.do(c)
+     
      return s
      
 
 def LocInt_Step1(N, s, slow):
+     """
+     - Purpose: Apply a step of a random circuit with nearest neighbour interactions acting on O(N) qubits at each timestep. This random circuit acts on N/slow qubits. Step 1, ZH on N/slow qubits. Step 2, C3 on N/slow qubits. Steps 3, 4, SWAP gates on N/slow qubits. 
+     - Inputs:
+         - N (number of qubits).
+         - s (stim.circuit): a stim circuit to evolve forward by one time step.
+         - slow (integer): controls how much to slow down the circuit. (e.g. so we only act on N/p qubits at each timestep).
+     - Outputs:
+         - s (stim.circuit): a stim circuit which has been evolved forward by one time step. 
+     """
 
      Choose = int(N/(slow))
-     qubits = np.random.choice(N, size = Choose, replace=False)
+     qubits = np.random.choice(N, size = Choose, replace=False) #Randomly chooses which qubits to act on with the gates.
      qubits = qubits.tolist()
      
 
-     for i in qubits:
+     for i in qubits: #Act with ZH gates.
           s.do(ZH(i))
      c = stim.Circuit()
      c.append_operation("I", [N-1])
@@ -249,6 +263,16 @@ def LocInt_Step1(N, s, slow):
      
 
 def LocInt_Step2(N, s, slow):
+     """
+     - Purpose: Apply a step of a random circuit with nearest neighbour interactions acting on O(N) qubits at each timestep. This random circuit acts on N/slow qubits. Step 1, ZH on N/slow qubits. Step 2, C3 on N/slow qubits. Steps 3, 4, SWAP gates on N/slow qubits. 
+     - Inputs:
+         - N (number of qubits).
+         - s (stim.circuit): a stim circuit to evolve forward by one time step.
+         - slow (integer): controls how much to slow down the circuit. (e.g. so we only act on N/p qubits at each timestep).
+     - Outputs:
+         - s (stim.circuit): a stim circuit which has been evolved forward by one time step. 
+     """
+
 
 
      Choose = int(N/(3*slow))
@@ -259,10 +283,10 @@ def LocInt_Step2(N, s, slow):
                div3.append(i)
      div3a = np.array(div3)
 
-     qubits = np.random.choice(div3a, size = Choose, replace = False)
+     qubits = np.random.choice(div3a, size = Choose, replace = False)#Randomly chooses which qubits to act on with the gates.
      qubits = qubits.tolist()
 
-     for i in qubits:
+     for i in qubits: #Act with C3 gates on the chosen qubits, randomizing which one is control.
           k = random.randint(0,6)
           if k == 0:
                s.do(C3(i, i+1, i+2))
@@ -283,6 +307,16 @@ def LocInt_Step2(N, s, slow):
      return s
 
 def LocInt_Step3(N, s, slow):
+     """
+     - Purpose: Apply a step of a random circuit with nearest neighbour interactions acting on O(N) qubits at each timestep. This random circuit acts on N/slow qubits. Step 1, ZH on N/slow qubits. Step 2, C3 on N/slow qubits. Steps 3, 4, SWAP gates on N/slow qubits. 
+     - Inputs:
+         - N (number of qubits).
+         - s (stim.circuit): a stim circuit to evolve forward by one time step.
+         - slow (integer): controls how much to slow down the circuit. (e.g. so we only act on N/p qubits at each timestep).
+     - Outputs:
+         - s (stim.circuit): a stim circuit which has been evolved forward by one time step. 
+     """
+
 
      Choose = int(N/(2*slow))
 
@@ -292,10 +326,10 @@ def LocInt_Step3(N, s, slow):
                div2.append(i)
      div2a = np.array(div2)
 
-     qubits = np.random.choice(div2a, size = Choose, replace = False)
+     qubits = np.random.choice(div2a, size = Choose, replace = False) #Randomly chooses which qubits to act on with the gates.
      qubits = qubits.tolist()
 
-     for i in qubits:
+     for i in qubits: #Act with SWAP gates.
           s.do(SWP(i, i+1))
      c = stim.Circuit()
      c.append_operation("I", [N-1])
@@ -305,6 +339,17 @@ def LocInt_Step3(N, s, slow):
      return s
 
 def LocInt_Step4(N, s, slow):
+     """
+     - Purpose: Apply a step of a random circuit with nearest neighbour interactions acting on O(N) qubits at each timestep. This random circuit acts on N/slow qubits. Step 1, ZH on N/slow qubits. Step 2, C3 on N/slow qubits. Steps 3, 4, SWAP gates on N/slow qubits. 
+     - Inputs:
+         - N (number of qubits).
+         - s (stim.circuit): a stim circuit to evolve forward by one time step.
+         - slow (integer): controls how much to slow down the circuit. (e.g. so we only act on N/p qubits at each timestep).
+     - Outputs:
+         - s (stim.circuit): a stim circuit which has been evolved forward by one time step. 
+     """
+
+     
 
      Choose = int((N-1)/(2*slow) -1)
 
@@ -314,10 +359,10 @@ def LocInt_Step4(N, s, slow):
                ndiv2.append(i)
      ndiv2a = np.array(ndiv2)
 
-     qubits = np.random.choice(ndiv2a, size = Choose, replace = False)
+     qubits = np.random.choice(ndiv2a, size = Choose, replace = False) #Randomly chooses which qubits to act on with gates.
      qubits = qubits.tolist()
 
-     for i in qubits:
+     for i in qubits: #Act with SWAP gates.
           s.do(SWP(i, i+1))
 
      c = stim.Circuit()
@@ -333,40 +378,20 @@ def LocInt_Step4(N, s, slow):
      
 
 def Id_Step(N, s):
+    """
+     - Purpose: Create a Tableau that acts with identity on all qubits. Useful for ensuring tha          t nothing happens in the first step of the circuit.
+     - Inputs:
+         - N (number of qubits).
+         - s (stim.circuit): a stim circuit to evolve forward by one time step.
+     - Outputs:
+         - s (stim.circuit): a stim circuit which has been evolved forward by one time step, by           acting with identity.
+    """
+    
      
-
+    
     c = stim.Circuit()
     c.append_operation("I", [N-1])
     s.do(c)
     return s
 
 
-def Local_Scrambling1(N, s):
-
-     r = random.randint(0, N-2)
-     r1 = random.randint(0,1)
-
-
-     c = stim.Circuit()
-     c.append_operation("I", [N-1])
-
-     if r1 == 0:
-          c.append_operation("CNOT", [r, r+1])
-     else:
-          c.append_operation("CNOT", [r+1, r])
-
-
-     s.do(c)
-
-     return s
-     
-     
-     
-def Local_Scrambling1_Init(N,s):
-     
-     c = stim.Circuit()
-     c.append_operation("H", [0])
-     s.do(c)
-
-     return s
-          

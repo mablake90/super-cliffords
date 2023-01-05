@@ -7,6 +7,13 @@ import time
 import math
 import circuits
 
+
+"""
+This file includes all functions used to compute the entropy. The command at the bottom of the file allows one to run the circuits and compute the entropy.
+
+The function gf2_rank(rows) is taken from the page: https://stackoverflow.com/questions/56856378/fast-computation-of-matrix-rank-over-gf2
+"""
+
 def sample_stabilizers(s):
     """
     - Purpose: Use stim to simulate a circuit.
@@ -53,6 +60,7 @@ def binaryMatrix(zStabilizers):
 
 def convert_signs(signs):
     
+    
     n = np.size(signs)
     for r in range(n):    
         if (signs[r] == 1):
@@ -84,10 +92,13 @@ def getCutStabilizers(binaryMatrix, cut):
 
 def rows(binMatrix):
     """
-    This probably does not work yet, but hopefully will give me a more direct way of computing entanglement entropy.
-
-       
+    - Purpose: Take a binary matrix and convert it into a list of integers, corresponding to the rows of the binary matrix expressed as integers.
+    - Inputs:
+        - binMatrix: a binary matrix of any size.
+    - Outputs:
+        - v (array): length of array is number of rows of the binary matrix. All entries will be integers.  
     """
+    
     N = np.shape(binMatrix)[0]
     v = []
     for i in range(0, N):
@@ -97,24 +108,7 @@ def rows(binMatrix):
         
     return v
 
-def rows2(zstab, N):
 
-    v = []
-
-    for rows in zstab:
-        r = 0
-        c = 0
-        for i in rows:
-            if i == 3:
-                r+= 2**(2*N - c)
-            if i == 2:
-                r+= 2**(2*N - c) + 2**(N -c)
-            if  i == 1:
-                r+= 2**(N-c)
-            c+= 1    
-        v.append(r)
-
-    return v    
         
     
 
@@ -123,14 +117,11 @@ def gf2_rank(rows):
     """
     - Purpose: Finds rank of a Binary matrix over F2.
      - Inputs: 
-        - The rows of the matrix are given as nonnegative integers in an array, thought
-    of as bit-strings.
+        - rows of Binary matrix are bit strings, expressed as integers.
      - Outputs:
         - an integer, the rank of the matrix.
-        
-    Note: This function modifies the input list. Use gf2_rank(rows.copy())
-    instead of gf2_rank(rows) to avoid modifying rows.
     """
+    
     rank = 0
     while rows:
         pivot_row = rows.pop()
@@ -153,49 +144,40 @@ def main():
     
     - N (integer): number of qubits.
     - T (integer): number of timesteps.
-    - M (integer): number of times to repeat the simulation and average over.
-    - l (integer): resolution (i.e. how often to compute the operator entanglement).
+    - rep (integer): number of times to repeat the simulation and average over.
+    - res (integer): resolution (i.e. how often to compute the operator entanglement).
+    - slow (integer): determines what proportion of total qubits to act on at each timestep.
     
     Also make a choice of circuit from the circuits.py file.
-    
     
     """
 
 
     startTime = time.time()
+    """
+    To compute the entropy of a circuit, first make a choice of random circuit. The two choices that we have below are LocInt, a circuit which acts on O(N) qubits with nearest neighbour interactions. Or FS3_Np a circuit that acts on O(N) qubits with all-to-all interactions. In order to compute the entropy one needs to make the following choices:
+    - N - integer, length of the chain of qubits.
+    - T - integer, number of timesteps for the evolution of the circuit.
+    - rep - integer, number of repititions to smooth over fluctutations.
+    - res - integer, resolution that specifies how often to compute the entropy.
+    - cut - integer (less than N), specifies the cut across which to compute the entanglement entropy.
+    - slow - integer, fixes the proportion of the chain on which to act on at each timestep.
 
-##    for i in range(0, 4):
-
-##        N = 120 + 60*i
- ##       print(N)
-  ##      T = 2000
-  ##      M = 50
- ##       res = 2
-  ##      cut = int(N/3)
- ##       slow = 1
- ##       v, w = circuits.runLocInt(N, T, M, res, slow, cut)
- ##       np.savez(f'Entropy_LocInt_ThirdChainCut_N{N}_T{T}.npz', v)
-        
-        
-        
-            
+    """        
 
     N = 120
-    T = 200
-    M = 10
+    T = 100
+    rep = 10
     res = 2
     cut = int(N/3)
     slow = 1
-#    v, w = circuits.runLocInt(N, T, M, res, slow, cut)
-    v, w = circuits.runFS3_Np(N, T, M, res, slow, cut)
+    v, w = circuits.runLocInt(N, T, rep, res, slow, cut) #Circuit with nearest neighbour interactions.
+#    v, w = circuits.runFS3_Np(N, T, rep, res, slow, cut) #Circuit with all to all interactions.
     
     totTime = (time.time() - startTime)
     print('Execution time in seconds:' + str(totTime))
     
-    
-   # A = np.min(np.argwhere(v > (cut - 2)))
-   # B = w[A]
-   # print(f'The Operator entanglement saturates after T={B} timesteps.')
+
                  	      
     plt.plot(w, v)
     plt.xlabel('Time')

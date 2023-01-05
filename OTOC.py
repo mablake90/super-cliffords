@@ -6,9 +6,28 @@ import time
 import matplotlib.pyplot as plt
 import random
 
+"""
+The code in this file allows one to compute the OTOC of certain random circuits. 
+
+The function row_sum and g are taken directly from [arXiv:quant-ph/0406196].
+"""
+
+
+
 
 def REF_binary(A, signs, N):
-    """Converts a matrix to row echelon form (REF)"""
+    """
+    - Purpose: Given a N x N matrix, A and an array of signs. This will convert the matrix to row echelon form (REF) and convert the signs using the rowsum operation.
+    - Inputs: 
+            - A (binary N x N matrix).
+            - signs (array of length N)
+            - N (integer).
+    - Outputs: 
+            - A (binary N x N matrix - in REF).
+            - signs (array of length N - updated using rowsum operation).
+
+    """
+    
     n_rows, n_cols = A.shape
 
     # Compute row echelon form (REF)
@@ -45,13 +64,19 @@ def REF_binary(A, signs, N):
             if A[i, j] == 1:
                 A[i] = (A[i] +  A[pivot_row]) % 2 # subtracting is same as adding in GF(2)
                 signs[i] = row_sum(A[i], A[pivot_row], signs[i], signs[pivot_row], N)
-                
-              
+                             
     return A, signs
 
 
 def g(x1, z1, x2, z2):
-    "Computes the function g needed for the rowsum operation."
+    """
+    Purpose: Computes the function g needed for the rowsum operation.
+    Inputs:
+         - x1, z1, x2, z2  in {0, 1} (i.e. four bits).
+    Outputs:
+         - rh in {0, 1} (i.e. one bit).
+    """
+
 
     if (x1 ==0) and (z1 == 0):
         g = 0
@@ -66,6 +91,15 @@ def g(x1, z1, x2, z2):
 
 
 def row_sum(h, i, rh, ri, N):
+    """ 
+    Purpose: Compute the row_sum operation.
+    Inputs:
+         - h, i -  two arrays of bits, length N (two rows from a binary matrix).
+         - rh, ri - two bits (the signs corresponding to the rows, h, i).
+         - N - an integer. The length of the arrays.
+    Outputs:
+         - rh - a bit. The sign of the new row obtained from adding h + i as bitstrings.
+    """
 
     m = np.size(h)
 
@@ -86,6 +120,14 @@ def row_sum(h, i, rh, ri, N):
     
 
 def xs(binMat):
+    """
+    Purpose: Given a stabilizer tableau (N, 2N) extract the X's of the tableau (i.e. the first N columns).
+    Inputs:
+         - binMat - a stabilizer tableau ( i.e. an (N, 2N) binary matrix).
+    Outputs:
+         - xs - a binary matrix of size (N, N).
+
+    """
 
     N = len(binMat)
     xs = np.zeros((N, N))
@@ -95,6 +137,16 @@ def xs(binMat):
 
 
 def small_zs(binMat, size2, N):
+    """
+    Purpose: Given a stabilizer tableau (N, 2N), extract a small portion of the Z's. I.e. the second N columns and only the rows with index larger than size2.
+    Inputs:
+          - binMat - a (N, 2N) binary matrix.
+          - size2 - an integer, less than N.
+          - N - an integer, dimension of binMat.
+    Outputs:
+          - small_zs - a (N-size2, N) binary matrix.
+
+    """
 
     small_zs = np.zeros((size2, N))
     small_zs[:,:] = binMat[N-size2:, N:]
@@ -112,7 +164,9 @@ def OTOC_FS3_Np(N, T, rep, res, slow, Op):
                - res: integer (resolution - i.e. how often the OTOC gets computed).
                - slow: integer (determines how much we slow down the action of the circuit).
                - Op: stim.TableauSimulator (gives a new operator which should be a super-Clifford and which we will use for computing the OTOC
-        - Outputs: ???
+        - Outputs: 
+               - v - an array of real numbers of length T/res containing the values of the OTOC at different timesteps.
+               - w - an array of real numbers of length T/res containing the timesteps.
 
 """
     Size = int(T/res) #specify size of output vectors.
@@ -125,9 +179,9 @@ def OTOC_FS3_Np(N, T, rep, res, slow, Op):
         s = stim.TableauSimulator()
         for i in range(0, T):
             if i == 0:
-                s = gates.Id_Step(N, s)
+                s = gates.Id_Step(N, s) #To give correct initial value.
             else:     
-                s = gates.FS3_NpStep(N, s, slow)
+                s = gates.FS3_NpStep(N, s, slow) #evolution of circuit.
                 
             if (i % res) == 0:
                 tableau1: stim.Tableau = s.current_inverse_tableau()**-1
@@ -169,7 +223,7 @@ def OTOC_FS3_Np(N, T, rep, res, slow, Op):
 
                         
                 if (Ans == 1):
-                    v[int(i/res)] += 0
+                    v[int(i/res)] += 0 
                 else:    
                     v[int(i/res)] +=(2**(-(rank)/2))/rep        
                     
@@ -187,7 +241,9 @@ def OTOC_Rand1(N, T, rep, res, Op):
                - rep: integer (number of repetitions).
                - res: integer (resolution - i.e. how often the OTOC gets computed).
                - Op: stim.TableauSimulator (gives a new operator which should be a super-Clifford and which we will use for computing the OTOC
-        - Outputs: ???
+        - Outputs: 
+               - v - an array of real numbers of length T/res containing the values of the OTOC at different timesteps.
+               - w - an array of real numbers of length T/res containing the timesteps.
 
 """
     Size = int(T/res) #specify size of output vectors.
@@ -261,9 +317,11 @@ def OTOC_LocInt(N, T, rep, res, slow, Op):
                - rep: integer (number of repetitions).
                - res: integer (resolution - i.e. how often the OTOC gets computed).
                - Op: stim.TableauSimulator (gives a new operator which should be a super-Clifford and which we will use for computing the OTOC
-        - Outputs: ???
-
+        - Outputs: 
+               - v - an array of real numbers of length T/res containing the values of the OTOC at different timesteps.
+               - w - an array of real numbers of length T/res containing the timesteps.
 """
+    
     Size = int(T/res) #specify size of output vectors.
     v = np.zeros(Size)
     w = np.zeros(Size)
@@ -334,6 +392,13 @@ def OTOC_LocInt(N, T, rep, res, slow, Op):
 
 
 def Op(N):
+    """
+    Purpose: build a stabilizer tableau corresponding to an operator that will act as the perturbation V(0) in the calculation of the OTOC.
+    Inputs:
+          - N - an integer (the number of qubits in the chain).
+    Outputs:
+         - s - a stim.TableauSimulator() with the gate(s) corresponding the operator V(0).
+    """
     s = stim.TableauSimulator()
 
     c1 = stim.Circuit()
@@ -352,6 +417,19 @@ def Op(N):
     
 
 def main():
+    """
+     Below one can evaluate the OTOC for one of three possible circuits. Rand1 is a nearest neighbour circuit, that acts on O(1) qubits at each timestep. LocInt is a nearest neighbour circuit that acts on O(N) qubits at each timestep. FS3_Np is an all-to-all circuit that acts on O(N) qubits at each timestep. In order to run this one needs to specify the following:
+    - N - an integer, the number of qubits in the chain.
+    - T - an integer, the number of timesteps for the evolution.
+    - rep - the number of repititons to smooth out fluctuations.
+    - res - the resolution, that specifies how often to calculate the OTOC.
+    - slow - the proportion of the qubits to act on at each timestep.
+    - Op1 -the operator that will be V(0) in the calculation of the OTOC. This can be modified by changing the function Op(N), above.
+
+    """
+
+
+    
     startTime = time.time()
 
 
@@ -361,9 +439,9 @@ def main():
     res = 1
     slow = 2
     Op1 = Op(N)
-#    v1, w1 = OTOC_LocInt(N, T, rep, res, slow, Op1)
+    v1, w1 = OTOC_LocInt(N, T, rep, res, slow, Op1)
 #    v2, w2 = OTOC_Rand1(N, T, rep, res, Op1)
-    v3, w3 = OTOC_FS3_Np(N, T, rep, res, slow, Op1)
+#    v3, w3 = OTOC_FS3_Np(N, T, rep, res, slow, Op1)
 
     
         
@@ -375,7 +453,7 @@ def main():
 
 
             	      
-    plt.plot(w3, v3)
+    plt.plot(w1, v1)
     plt.xlabel('Time')
     plt.ylabel('OTOC')
     plt.title(f'OTOC for N = {N}')
