@@ -1,11 +1,9 @@
-from typing import List, Collection
 import stim
 import numpy as np
-import gates
+import supercliffords.gates as gates
 import matplotlib.pyplot as plt
 import time
-import math
-import circuits
+import supercliffords.circuits as circuits
 
 
 """
@@ -14,7 +12,7 @@ This file includes all functions used to compute the entropy. The command at the
 The function gf2_rank(rows) is taken from the page: https://stackoverflow.com/questions/56856378/fast-computation-of-matrix-rank-over-gf2
 """
 
-def sample_stabilizers(s):
+def sample_stabilisers(s):
     """
     - Purpose: Use stim to simulate a circuit.
     -Inputs:
@@ -22,17 +20,14 @@ def sample_stabilizers(s):
     -Outputs:
          - zs2 (array): The result of conjugating the Z generators by the given stim circuit.     
     """
-
     tableau: stim.Tableau = s.current_inverse_tableau() ** -1
     n = len(tableau)
     zs = [tableau.z_output(k) for k in range(n)]
     zs2 = np.array(zs)
-    signs = [(zs[k].sign).real for k in range(n)]
-    signs2 = np.array(signs)
     return zs2
     
     
-def binaryMatrix(zStabilizers):
+def binary_matrix(zStabilizers):
     """
         - Purpose: Construct the binary matrix representing the stabilizer states.
         - Inputs:
@@ -59,15 +54,12 @@ def binaryMatrix(zStabilizers):
     return binaryMatrix
 
 def convert_signs(signs):
-    
-    
     n = np.size(signs)
     for r in range(n):    
         if (signs[r] == 1):
             signs[r] = 0
         else:
             signs[r] = 1
-        
     return signs
 
 
@@ -83,10 +75,8 @@ def getCutStabilizers(binaryMatrix, cut):
     """
     N = len(binaryMatrix)
     cutMatrix = np.zeros((N, 2*cut))
-
     cutMatrix[:,:cut] = binaryMatrix[:,:cut]
     cutMatrix[:,cut:] = binaryMatrix[:,N:N+cut]
-
     return cutMatrix 
 
 
@@ -98,14 +88,12 @@ def rows(binMatrix):
     - Outputs:
         - v (array): length of array is number of rows of the binary matrix. All entries will be integers.  
     """
-    
     N = np.shape(binMatrix)[0]
     v = []
     for i in range(0, N):
          test_list = [int(a) for a in binMatrix[i] ]
          test_list.reverse()
          v.append(int("".join(str(x) for x in test_list), 2))
-        
     return v
 
 
@@ -121,7 +109,6 @@ def gf2_rank(rows):
      - Outputs:
         - an integer, the rank of the matrix.
     """
-    
     rank = 0
     while rows:
         pivot_row = rows.pop()

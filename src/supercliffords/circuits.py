@@ -1,11 +1,11 @@
 from typing import List, Collection
 import stim
 import numpy as np
-import gates
+import supercliffords.gates as gates
 import matplotlib.pyplot as plt
 import time
 import math
-import entropy
+import supercliffords.entropy as entropy
 
 
 """
@@ -36,8 +36,8 @@ def runFS1(N, T, rep, res, cut):
         for i in range(0, T):
             s = gates.FS1Step(N, s)    
             if (i % res) == 0: #Only compute the entropy as specified by resolution.
-            	zs2 = entropy.sample_stabilizers(s)
-            	mat = entropy.binaryMatrix(zs2)
+            	zs2 = entropy.sample_stabilisers(s)
+            	mat = entropy.binary_matrix(zs2)
             	b2 = entropy.getCutStabilizers(mat, cut)
             	b3 = entropy.rows(b2)
             	SA = entropy.gf2_rank(b3.copy()) - cut #Computes entropy.
@@ -84,8 +84,8 @@ def runFS2(N, T, rep, res, cut):
                 
                     
             if (i % res) == 0: #Only compute entropy as specified by resolution.
-            	zs2 = entropy.sample_stabilizers(s)
-            	mat = entropy.binaryMatrix(zs2)
+            	zs2 = entropy.sample_stabilisers(s)
+            	mat = entropy.binary_matrix(zs2)
             	b2 = entropy.getCutStabilizers(mat, cut)
             	b3 = entropy.rows(b2)
             	SA = entropy.gf2_rank(b3.copy()) - cut #Computes entropy.
@@ -126,8 +126,8 @@ def runFS3(N, T, rep, res, cut):
         for i in range(0, T):
             s = gates.FS3Step(N, s)    
             if (i % res) == 0:
-            	zs2 = entropy.sample_stabilizers(s)
-            	mat = entropy.binaryMatrix(zs2)
+            	zs2 = entropy.sample_stabilisers(s)
+            	mat = entropy.binary_matrix(zs2)
             	b2 = entropy.getCutStabilizers(mat, cut)
             	b3 = entropy.rows(b2)
             	SA = entropy.gf2_rank(b3.copy()) - cut
@@ -173,8 +173,8 @@ def runFS3_Np(N, T, rep, res, slow, cut):
                 s = gates.FS3_NpStep(N, s, slow)
                 
             if (i % res) == 0: #Only compute entropy as specified by resolution.
-            	zs2 = entropy.sample_stabilizers(s)
-            	mat = entropy.binaryMatrix(zs2)
+            	zs2 = entropy.sample_stabilisers(s)
+            	mat = entropy.binary_matrix(zs2)
             	b2 = entropy.getCutStabilizers(mat, cut)
             	b3 = entropy.rows(b2)
             	SA = entropy.gf2_rank(b3.copy()) - cut #Compute entropy.
@@ -229,8 +229,8 @@ def runLocInt(N, T, rep, res, slow, cut):
 
                 
             if (i % res) == 0: #Only compute entropy as specified by resolution.
-            	zs2 = entropy.sample_stabilizers(s)
-            	mat = entropy.binaryMatrix(zs2)
+            	zs2 = entropy.sample_stabilisers(s)
+            	mat = entropy.binary_matrix(zs2)
             	b2 = entropy.getCutStabilizers(mat, cut)
             	b3 = entropy.rows(b2)
             	SA = entropy.gf2_rank(b3.copy()) - cut #Compute entropy.

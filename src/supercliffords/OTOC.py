@@ -1,7 +1,7 @@
 import stim
 import numpy as np
-import gates
-import entropy
+import supercliffords.gates as gates
+import supercliffords.entropy as entropy
 import time
 import matplotlib.pyplot as plt
 import random
@@ -195,7 +195,7 @@ def OTOC_FS3_Np(N, T, rep, res, slow, Op):
                 zs2 = np.array(zs)
                 signs = [(zs[k].sign).real for k in range(n)]
                 signs2 = np.array(signs)
-                bMat = entropy.binaryMatrix(zs2)
+                bMat = entropy.binary_matrix(zs2)
             
                 signs3 = entropy.convert_signs(signs2)
                
@@ -271,7 +271,7 @@ def OTOC_Rand1(N, T, rep, res, Op):
                 zs2 = np.array(zs)
                 signs = [(zs[k].sign).real for k in range(n)]
                 signs2 = np.array(signs)
-                bMat = entropy.binaryMatrix(zs2)
+                bMat = entropy.binary_matrix(zs2)
             
                 signs3 = entropy.convert_signs(signs2)
                
@@ -356,7 +356,7 @@ def OTOC_LocInt(N, T, rep, res, slow, Op):
                 zs2 = np.array(zs)
                 signs = [(zs[k].sign).real for k in range(n)]
                 signs2 = np.array(signs)
-                bMat = entropy.binaryMatrix(zs2)
+                bMat = entropy.binary_matrix(zs2)
             
                 signs3 = entropy.convert_signs(signs2)
                

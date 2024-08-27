@@ -1,11 +1,11 @@
 import numpy as np
 import math
 import random
-import OTOC
+import supercliffords.OTOC as OTOC
 import matplotlib.pyplot as plt
-import gates
+import supercliffords.gates as gates
 import stim
-import entropy
+import supercliffords.entropy as entropy
 
 
 """
@@ -217,7 +217,7 @@ def OTOC_Test2(N, T, rep, res, slow, Op, V0):
                 zs2 = np.array(zs)
                 signs = [(zs[k].sign).real for k in range(n)]
                 signs2 = np.array(signs)
-                bMat = entropy.binaryMatrix(zs2)
+                bMat = entropy.binary_matrix(zs2)
                 signs3 = entropy.convert_signs(signs2)
                 REF, signs3 = OTOC.REF_binary(bMat, signs3, N)
                 

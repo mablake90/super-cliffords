@@ -19,12 +19,9 @@ def C3(i, j, k):
      - Outputs:
            - c (stim.circuit): a stim circuit that applies C3 to the chosen qubits.
      """
-
      c = stim.Circuit()
      c.append_operation("CY", [i, j])
      c.append_operation("CY", [i, k])
- 
- 
      return c
     
    
@@ -39,11 +36,9 @@ def ZH(k):
      - Outputs:
            - c (stim.circuit): a stim circuit that applies Z.H to the chosen qubit.
      """
-
      c = stim.Circuit()
      c.append_operation("H", [k])
      c.append_operation("Z" , [k])
-      
      return c
 
 
@@ -57,13 +52,14 @@ def SWP(i, j):
      - Outputs:
            - c (stim.circuit): a stim circuit that applies SWAP to the chosen qubits.
     """
-     
     c = stim.Circuit()
-    c.append_operation("SWAP", [i, j])      
-
+    c.append_operation("SWAP", [i, j])
     return c
     
-    
+
+
+#TODO: From here down I will delete.
+
 def Rand1Step(N, s):
     """
     - Purpose: Apply a circuit corresponding to one single step of a random circuit. This random circuit applies Z.H to a random qubit and applies C3 to three randomly chosen adjacent qubits.
@@ -141,8 +137,7 @@ def FS2StepE(N, s):
 
     for i in range(0, N):
         s.do(ZH(i))
-        
-    
+         
     return s
     
     
@@ -196,8 +191,6 @@ def FS3Step(N, s):
      s.do(C3(r[0], r[M4], r[2*M4]))
 
      return s
-
-
 
 def FS3_NpStep(N, s, slow):
      """
@@ -386,9 +379,6 @@ def Id_Step(N, s):
      - Outputs:
          - s (stim.circuit): a stim circuit which has been evolved forward by one time step, by           acting with identity.
     """
-    
-     
-    
     c = stim.Circuit()
     c.append_operation("I", [N-1])
     s.do(c)
