@@ -30,11 +30,17 @@ XYY = np.kron(X, np.kron(Y, Y))
 
 YYY = np.kron(Y, np.kron(Y, Y))
 
-CX12 = np.kron(np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]]), Id)
+CX12 = np.kron(
+    np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]]), Id
+)
 
-CZ12 = np.kron(np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, -1]]), Id)
+CZ12 = np.kron(
+    np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, -1]]), Id
+)
 
-CX21 = np.kron(np.array([[1, 0, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0], [0, 1, 0, 0]]), Id)
+CX21 = np.kron(
+    np.array([[1, 0, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0], [0, 1, 0, 0]]), Id
+)
 
 CX31 = np.array(
     [
@@ -72,7 +78,9 @@ SWAP23 = np.kron(Id, SWAP)
 
 SWAP13 = np.matmul(SWAP12, np.matmul(SWAP23, SWAP12))
 
-C3_123 = np.matmul(CX21, np.matmul(CX31, np.matmul(CZ12, np.matmul(T1_6, T2_6))))
+C3_123 = np.matmul(
+    CX21, np.matmul(CX31, np.matmul(CZ12, np.matmul(T1_6, T2_6)))
+)
 
 C3_123_dag = np.conjugate(np.transpose(C3_123))
 
@@ -111,11 +119,13 @@ def circuit_one_step_test(s, U, N):
     Purpose: Move forward by one step of a random circuit.
 
     Inputs: - s: a stim circuit.
-            - U: a matrix on the underlying Hilbert space, should be the same operator as that found in s.
+            - U: a matrix on the underlying Hilbert space, should be the same
+              operator as that found in s.
             - N (int): number of qubits.
 
     Outputs: -s: stim circuit, updated by one step of random circuit.
-             - U: a matrix on underlying Hilbert space, updated by one step of random circuit.
+             - U: a matrix on underlying Hilbert space, updated by one step of
+               random circuit.
     """
     assert N > 2, "Must be three qubits or more."
     gates_dict = {}
@@ -172,11 +182,13 @@ def circuit_one_step_test(s, U, N):
 
 def op(N):
     """
-    Purpose: Create an operator which will be the perturbation V(0) in the OTOC calculation.
+    Purpose: Create an operator which will be the perturbation V(0) in the
+      OTOC calculation.
 
     Inputs: - None.
     Outputs: - s: a stim circuit with operator V(0) encoded in it.
-             - V0: a matrix on underlying Hilbert space representing the same operator.
+             - V0: a matrix on underlying Hilbert space representing the same
+               operator.
 
     """
 
@@ -201,7 +213,8 @@ def otoc_operator(U, W0, V0):
             np.matmul(
                 dagger(V0),
                 np.matmul(
-                    dagger(U), np.matmul(W0, np.matmul(U, np.matmul(V0, dagger(U))))
+                    dagger(U),
+                    np.matmul(W0, np.matmul(U, np.matmul(V0, dagger(U)))),
                 ),
             ),
         ),

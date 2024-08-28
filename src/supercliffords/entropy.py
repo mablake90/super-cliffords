@@ -1,12 +1,14 @@
+"""
+Module with functions used to compute the entropy.
+The command at the bottom of the file allows one to run the circuits and
+ compute the entropy.
+
+The function gf2_rank(rows) is taken from the page:
+ https://stackoverflow.com/questions/56856378/fast-computation-of-matrix-rank-over-gf2
+"""
+
 import stim
 import numpy as np
-
-
-"""
-This file includes all functions used to compute the entropy. The command at the bottom of the file allows one to run the circuits and compute the entropy.
-
-The function gf2_rank(rows) is taken from the page: https://stackoverflow.com/questions/56856378/fast-computation-of-matrix-rank-over-gf2
-"""
 
 
 def sample_stabilisers(s):
@@ -15,7 +17,8 @@ def sample_stabilisers(s):
     -Inputs:
          - s (stim.circuit): Any circuit you like which you wish to simulate.
     -Outputs:
-         - zs2 (np.ndarray): The result of conjugating the Z generators by the given stim circuit.
+         - zs2 (np.ndarray): The result of conjugating the Z generators by the
+           given stim circuit.
     """
     tableau: stim.Tableau = s.current_inverse_tableau() ** -1
     n = len(tableau)
@@ -28,9 +31,11 @@ def binary_matrix(zStabilizers):
     """
     - Purpose: Construct the binary matrix representing the stabilizer states.
     - Inputs:
-        - zStabilizers (np.ndarray): The result of conjugating the Z generators on the initial state.
+        - zStabilizers (np.ndarray): The result of conjugating the Z
+          generators on the initial state.
     Outputs:
-        - binaryMatrix (np.ndarray of size (N, 2N)): An array that describes the location of the stabilizers in the tableau representation.
+        - binaryMatrix (np.ndarray of size (N, 2N)): An array that describes
+          the location of the stabilizers in the tableau representation.
     """
     N = len(zStabilizers)
     binaryMatrix = np.zeros((N, 2 * N))
@@ -57,7 +62,8 @@ def convert_signs(signs):
     Inputs:
         - signs (np.ndarray): The signs of the stabilizer states.
     Outputs:
-        - signs (np.ndarray): The signs of the stabilizer states in binary format.
+        - signs (np.ndarray): The signs of the stabilizer states in binary
+          format.
     """
     n = np.size(signs)
     for r in range(n):
@@ -70,12 +76,15 @@ def convert_signs(signs):
 
 def get_cut_stabilizers(binaryMatrix, cut):
     """
-    - Purpose: Return only the part of the binary matrix that corresponds to the qubits we want to consider for a bipartition.
+    - Purpose: Return only the part of the binary matrix that corresponds to
+      the qubits we want to consider for a bipartition.
     - Inputs:
-        - binaryMatrix (np.ndarray of size (N, 2N)): The binary matrix for the stabilizer generators.
+        - binaryMatrix (np.ndarray of size (N, 2N)): The binary matrix for the
+          stabilizer generators.
         - cut (integer): Location for the cut.
     - Outputs:
-        - cutMatrix (np.ndarray of size (N, 2cut)): The binary matrix for the cut on the left.
+        - cutMatrix (np.ndarray of size (N, 2cut)): The binary matrix for the
+          cut on the left.
     """
     sh = binaryMatrix.shape
     assert sh[1] == 2 * sh[0], "shape of array must be (N, 2N)"
@@ -89,12 +98,14 @@ def get_cut_stabilizers(binaryMatrix, cut):
 
 def rows(binMatrix):
     """
-    - Purpose: Take a binary matrix and convert it into a list of integers, corresponding to the rows of the binary matrix expressed as integers
+    - Purpose: Take a binary matrix and convert it into a list of integers,
+      corresponding to the rows of the binary matrix expressed as integers
     conversion method: bigendian.
     - Inputs:
         - binMatrix (np.ndarray): a binary array of any size.
     - Outputs:
-        - v (np.ndarray): length of array is number of rows of the binary matrix. All entries will be integers.
+        - v (np.ndarray): length of array is number of rows of the binary
+          matrix. All entries will be integers.
     """
     N = np.shape(binMatrix)[0]
     v = []

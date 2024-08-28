@@ -21,9 +21,15 @@ class Step(ABC):
         self.N = N
         if when is None:
             when = "always"
-        if isinstance(when, str) and when not in ["first", "always", "even", "odd"]:
+        if isinstance(when, str) and when not in [
+            "first",
+            "always",
+            "even",
+            "odd",
+        ]:
             raise ValueError(
-                "Invalid value for 'when'. Currently accepted values are 'first', 'always', 'even','odd'."
+                """Invalid value for 'when'. Currently accepted values are
+                'first','always', 'even','odd'."""
             )
 
         self.when = when

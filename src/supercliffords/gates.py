@@ -11,7 +11,8 @@ def C3(i, j, k):
           - j (integer): second qubit to act on with C3
           - k (integer): third qubit to act on with C3
     - Outputs:
-          - c (stim.circuit): a stim circuit that applies C3 to the chosen qubits.
+          - c (stim.circuit): a stim circuit that applies C3 to the chosen
+            qubits.
     """
     c = stim.Circuit()
     c.append_operation("CY", [i, j])
@@ -26,7 +27,8 @@ def ZH(k):
           - k (integer): qubit to act on with Z.H
 
     - Outputs:
-          - c (stim.circuit): a stim circuit that applies Z.H to the chosen qubit.
+          - c (stim.circuit): a stim circuit that applies Z.H to the chosen
+            qubit.
     """
     c = stim.Circuit()
     c.append_operation("H", [k])
@@ -42,7 +44,8 @@ def SWP(i, j):
           - j (integer): second qubit to act on with SWAP
 
     - Outputs:
-          - c (stim.circuit): a stim circuit that applies SWAP to the chosen qubits.
+          - c (stim.circuit): a stim circuit that applies SWAP to the chosen
+            qubits.
     """
     c = stim.Circuit()
     c.append_operation("SWAP", [i, j])

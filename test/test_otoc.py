@@ -22,7 +22,8 @@ def test_ref_binary():
     N = 3
     ref, signs = ref_binary(M, signs, N)
     assert np.allclose(
-        ref, np.array([[1, 0, 1, 0, 0, 0], [0, 1, 0, 1, 0, 0], [0, 0, 0, 0, 0, 0]])
+        ref,
+        np.array([[1, 0, 1, 0, 0, 0], [0, 1, 0, 1, 0, 0], [0, 0, 0, 0, 0, 0]]),
     )
     assert np.allclose(signs, np.array([1, 1, 1]))
 

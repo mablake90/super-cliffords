@@ -28,7 +28,10 @@ def test_C3():
             1
             / 8
             * np.trace(
-                ket0.conjugate().transpose() @ obu.conjugate().transpose() @ ket0 @ obu
+                ket0.conjugate().transpose()
+                @ obu.conjugate().transpose()
+                @ ket0
+                @ obu
             ).item()
         )
         assert np.isclose(res, resu)
@@ -52,7 +55,10 @@ def test_ZH():
             1
             / 2
             * np.trace(
-                ket0.conjugate().transpose() @ obu.conjugate().transpose() @ ket0 @ obu
+                ket0.conjugate().transpose()
+                @ obu.conjugate().transpose()
+                @ ket0
+                @ obu
             ).item()
         )
         print(res, resu)

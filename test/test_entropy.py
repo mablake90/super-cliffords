@@ -31,7 +31,9 @@ def test_convert_signs():
 
 
 def test_get_cut_stabilizers():
-    matrix = np.array([[1, 0, 0, 1, 0, 0], [0, 1, 0, 0, 1, 0], [0, 0, 1, 0, 0, 1]])
+    matrix = np.array(
+        [[1, 0, 0, 1, 0, 0], [0, 1, 0, 0, 1, 0], [0, 0, 1, 0, 0, 1]]
+    )
     cut = 2
     cut_matrix = get_cut_stabilizers(matrix, cut)
     expected_cut_matrix = np.array([[1, 0, 1, 0], [0, 1, 0, 1], [0, 0, 0, 0]])

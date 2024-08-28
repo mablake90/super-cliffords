@@ -34,11 +34,14 @@ class Circuit:
         params:
             t (int): number of timesteps.
             cut (int): The cut across which to compute the entropy.
-            res (int): resolution (i.e. how often to compute the operator entanglement).
-            rep (int): number of times to repeat the simulation and average over.
+            res (int): resolution (i.e. how often to compute the operator
+            entanglement).
+            rep (int): number of times to repeat the simulation and
+            average over.
         returns:
             S (np.array): Operator entanglement.
-            ts (np.array): Timesteps at which the operator entanglement was computed.
+            ts (np.array): Timesteps at which the operator entanglement was
+            computed.
         """
         ts = np.zeros(t // res)
         S = np.zeros(t // res)
@@ -59,12 +62,15 @@ class Circuit:
         params:
             t (int): number of timesteps.
             cut (int): The cut across which to compute the entropy.
-            res (int): resolution (i.e. how often to compute the operator entanglement).
-            rep (int): number of times to repeat the simulation and average over.
+            res (int): resolution (i.e. how often to compute the operator
+            entanglement).
+            rep (int): number of times to repeat the simulation and average
+              over.
             op (stim.TableauSimulator): The perturbation operator V0.
         returns:
             f (np.array): Out-of-time-ordered correlator.
-            ts (np.array): Timesteps at which the operator entanglement was computed.
+            ts (np.array): Timesteps at which the operator entanglement was
+            computed.
         """
         ts = np.zeros(t // res)
         f = np.zeros(t // res)
@@ -106,7 +112,8 @@ class ThreeQuarterCircuit(Circuit):
 
 class AlternatingCircuit(Circuit):
     """
-    A super-clifford circui that acts with T on all qubits it acts on on even steps,
+    A super-clifford circui that acts with T on all qubits it acts on on even
+      steps,
     and with C3 on all qubits it acts on on odd steps.
 
     params:

@@ -3,7 +3,8 @@ import numpy as np
 import supercliffords.entropy as entropy
 
 """
-The code in this file allows one to compute the OTOC of certain random circuits.
+The code in this file allows one to compute the OTOC of certain random
+ circuits.
 
 The function row_sum and g are taken directly from [arXiv:quant-ph/0406196].
 """
@@ -11,7 +12,9 @@ The function row_sum and g are taken directly from [arXiv:quant-ph/0406196].
 
 def ref_binary(A, signs, N):
     """
-    - Purpose: Given a N x 2N matrix, A and an array of signs. This will convert the matrix to row echelon form (REF) and convert the signs using the rowsum operation.
+    - Purpose: Given a N x 2N matrix, A and an array of signs. This will
+      convert the matrix to row echelon form (REF) and convert the signs using
+        the rowsum operation.
     - Inputs:
             - A (binary N x 2N np.ndarray).
             - signs (np.ndarray of length N)
@@ -59,7 +62,9 @@ def ref_binary(A, signs, N):
                 A[i] = (
                     A[i] + A[pivot_row]
                 ) % 2  # subtracting is same as adding in GF(2)
-                signs[i] = row_sum(A[i], A[pivot_row], signs[i], signs[pivot_row], N)
+                signs[i] = row_sum(
+                    A[i], A[pivot_row], signs[i], signs[pivot_row], N
+                )
 
     return A, signs
 
@@ -88,11 +93,13 @@ def row_sum(h, i, rh, ri, N):
     """
     Purpose: Compute the row_sum operation.
     Inputs:
-         - h, i -  two arrays of bits, length 2N (two rows from a binary matrix).
+         - h, i -  two arrays of bits, length 2N
+           (two rows from a binary matrix).
          - rh, ri - two bits (the signs corresponding to the rows, h, i).
          - N - an integer. The number of qubits in the chain.
     Outputs:
-         - rh - a bit. The sign of the new row obtained from adding h + i as bitstrings.
+         - rh - a bit.
+         The sign of the new row obtained from adding h + i as bitstrings.
     """
     k = 0
     for j in range(N):
@@ -109,9 +116,11 @@ def row_sum(h, i, rh, ri, N):
 
 def xs(binary_array):
     """
-    Purpose: Given a stabilizer tableau (N, 2N) extract the X's of the tableau (i.e. the first N columns).
+    Purpose: Given a stabilizer tableau (N, 2N) extract the X's of
+    the tableau (i.e. the first N columns).
     Inputs:
-         - bin_array (N, 2N), np.ndarray, binary - a stabilizer tableau ( i.e. an (N, 2N) binary matrix).
+         - bin_array (N, 2N), np.ndarray, binary - a stabilizer tableau
+            ( i.e. an (N, 2N) binary matrix).
     Outputs:
          - xs (np.ndarray) - a binary matrix of size (N, N).
     """
@@ -123,8 +132,10 @@ def xs(binary_array):
 
 def small_zs(bin_array, starting_row_index, N):
     """
-    Purpose: Given a stabilizer tableau (N, 2N), extract a small portion of the Z's.
-      I.e. the second N columns and only the rows with index larger than N-starting_row_index.
+    Purpose: Given a stabilizer tableau (N, 2N), extract
+        a small portion of the Z's.
+      I.e. the second N columns and only the rows with index larger
+        than N-starting_row_index.
     Inputs:
           - bin_array (np.ndarray) - a (N, 2N) binary matrix.
           - starting_row_index (int)- an integer, less than N.

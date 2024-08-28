@@ -1,1 +1,2 @@
-"""A module for simulation of operator scrambling, using super Clifford circuits."""
+"""A module for simulation of operator scrambling,
+using super Clifford circuits."""
