@@ -1,9 +1,5 @@
 import stim
 import numpy as np
-import supercliffords.gates as gates
-import matplotlib.pyplot as plt
-import time
-import supercliffords.circuits2 as circuits2
 
 
 """
@@ -140,59 +136,3 @@ def compute_entropy(s: stim.Circuit, cut: int):
     b3 = rows(b2)
     S = gf2_rank(b3.copy()) - cut
     return S
-
-    
-def main():
-    """
-    To compute operator entanglement of a circuit. Fix the following parameters:
-    
-    - N (integer): number of qubits.
-    - T (integer): number of timesteps.
-    - rep (integer): number of times to repeat the simulation and average over.
-    - res (integer): resolution (i.e. how often to compute the operator entanglement).
-    - slow (integer): determines what proportion of total qubits to act on at each timestep.
-    
-    Also make a choice of circuit from the circuits.py file.
-    
-    """
-
-
-    startTime = time.time()
-    """
-    To compute the entropy of a circuit, first make a choice of random circuit. The two choices that we have below are LocInt, a circuit which acts on O(N) qubits with nearest neighbour interactions. Or FS3_Np a circuit that acts on O(N) qubits with all-to-all interactions. In order to compute the entropy one needs to make the following choices:
-    - N - integer, length of the chain of qubits.
-    - T - integer, number of timesteps for the evolution of the circuit.
-    - rep - integer, number of repititions to smooth over fluctutations.
-    - res - integer, resolution that specifies how often to compute the entropy.
-    - cut - integer (less than N), specifies the cut across which to compute the entanglement entropy.
-    - slow - integer, fixes the proportion of the chain on which to act on at each timestep.
-
-    """        
-
-    N = 120
-    T = 100
-    rep = 1
-    res = 10
-    cut = int(N/3)
-    slow = 1
-    v, w = circuits2.runLocInt(N, T, rep, res, slow, cut) #Circuit with nearest neighbour interactions.
-#    v, w = circuits.runFS3_Np(N, T, rep, res, slow, cut) #Circuit with all to all interactions.
-    
-    totTime = (time.time() - startTime)
-    print('Execution time in seconds:' + str(totTime))
-    
-
-                 	      
-    plt.plot(w, v)
-    plt.xlabel('Time')
-    plt.ylabel('S')
-    plt.title(f'Operator Entanglement for N = {N}')
-    
-    plt.show()  
-    
-if (__name__ == '__main__'):
-    main()     
- 
-    
-
-    

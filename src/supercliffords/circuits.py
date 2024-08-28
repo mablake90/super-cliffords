@@ -9,6 +9,7 @@ from supercliffords.steps import (
     StepSequence,
 )
 from supercliffords.entropy import compute_entropy
+from supercliffords.otoc import compute_otoc
 
 
 class Circuit():
@@ -49,6 +50,32 @@ class Circuit():
                 if stepcount % res == 0:
                     S[stepcount // res] += compute_entropy(s, cut) / rep
         return S, ts
+    
+    def compute_otoc(self, t, res, rep, op):
+        """
+        Compute the out-of-time-ordered correlator of the circuit.
+        params:
+            t (int): number of timesteps.
+            cut (int): The cut across which to compute the entropy.
+            res (int): resolution (i.e. how often to compute the operator entanglement).
+            rep (int): number of times to repeat the simulation and average over.
+            op (stim.TableauSimulator): The perturbation operator V0.
+        returns:
+            f (np.array): Out-of-time-ordered correlator.
+            ts (np.array): Timesteps at which the operator entanglement was computed.
+        """
+        ts = np.zeros(t // res)
+        f = np.zeros(t // res)
+        for i in range(t // res):
+            ts[i] = i * res
+        
+        for _ in range(rep):
+            s = stim.TableauSimulator()
+            for stepcount in range(0, t):
+                s = self.steps.apply(s, stepcount)
+                if stepcount % res == 0:
+                    f[stepcount // res] += compute_otoc(s, self.N, op) / rep
+        return f, ts
 
 
 class ThreeQuarterCircuit(Circuit):
