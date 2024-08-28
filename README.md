@@ -1,4 +1,4 @@
-# ProjectB
+# super-cliffords
 
 This repository contains code used to compute operator entanglement entropy and out-of-time ordered correlators of super-stabilizer circuits. This formed part of a project carried out at the University of Bristol, with Mike Blake and Noah Linden. The repository is primarily for my own personal use.
 
