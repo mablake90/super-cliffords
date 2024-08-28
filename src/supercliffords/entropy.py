@@ -8,46 +8,48 @@ This file includes all functions used to compute the entropy. The command at the
 The function gf2_rank(rows) is taken from the page: https://stackoverflow.com/questions/56856378/fast-computation-of-matrix-rank-over-gf2
 """
 
+
 def sample_stabilisers(s):
     """
     - Purpose: Use stim to simulate a circuit.
     -Inputs:
          - s (stim.circuit): Any circuit you like which you wish to simulate.
     -Outputs:
-         - zs2 (np.ndarray): The result of conjugating the Z generators by the given stim circuit.     
+         - zs2 (np.ndarray): The result of conjugating the Z generators by the given stim circuit.
     """
     tableau: stim.Tableau = s.current_inverse_tableau() ** -1
     n = len(tableau)
     zs = [tableau.z_output(k) for k in range(n)]
     zs2 = np.array(zs)
     return zs2
-    
-    
+
+
 def binary_matrix(zStabilizers):
     """
-        - Purpose: Construct the binary matrix representing the stabilizer states.
-        - Inputs:
-            - zStabilizers (np.ndarray): The result of conjugating the Z generators on the initial state.
-        Outputs:
-            - binaryMatrix (np.ndarray of size (N, 2N)): An array that describes the location of the stabilizers in the tableau representation.
+    - Purpose: Construct the binary matrix representing the stabilizer states.
+    - Inputs:
+        - zStabilizers (np.ndarray): The result of conjugating the Z generators on the initial state.
+    Outputs:
+        - binaryMatrix (np.ndarray of size (N, 2N)): An array that describes the location of the stabilizers in the tableau representation.
     """
     N = len(zStabilizers)
-    binaryMatrix = np.zeros((N,2*N))
-    r = 0 # Row number
+    binaryMatrix = np.zeros((N, 2 * N))
+    r = 0  # Row number
     for row in zStabilizers:
-        c = 0 # Column number
+        c = 0  # Column number
         for i in row:
-            if i == 3: # Pauli Z
-                binaryMatrix[r,N + c] = 1
-            if i == 2: # Pauli Y
-                binaryMatrix[r,N + c] = 1
-                binaryMatrix[r,c] = 1
-            if i == 1: # Pauli X
-                binaryMatrix[r,c] = 1
+            if i == 3:  # Pauli Z
+                binaryMatrix[r, N + c] = 1
+            if i == 2:  # Pauli Y
+                binaryMatrix[r, N + c] = 1
+                binaryMatrix[r, c] = 1
+            if i == 1:  # Pauli X
+                binaryMatrix[r, c] = 1
             c += 1
         r += 1
 
     return binaryMatrix
+
 
 def convert_signs(signs):
     """
@@ -58,30 +60,31 @@ def convert_signs(signs):
         - signs (np.ndarray): The signs of the stabilizer states in binary format.
     """
     n = np.size(signs)
-    for r in range(n):    
-        if (signs[r] == 1):
+    for r in range(n):
+        if signs[r] == 1:
             signs[r] = 0
         else:
             signs[r] = 1
     return signs
 
+
 def get_cut_stabilizers(binaryMatrix, cut):
     """
-        - Purpose: Return only the part of the binary matrix that corresponds to the qubits we want to consider for a bipartition.
-        - Inputs:
-            - binaryMatrix (np.ndarray of size (N, 2N)): The binary matrix for the stabilizer generators.
-            - cut (integer): Location for the cut.
-        - Outputs:
-            - cutMatrix (np.ndarray of size (N, 2cut)): The binary matrix for the cut on the left.
+    - Purpose: Return only the part of the binary matrix that corresponds to the qubits we want to consider for a bipartition.
+    - Inputs:
+        - binaryMatrix (np.ndarray of size (N, 2N)): The binary matrix for the stabilizer generators.
+        - cut (integer): Location for the cut.
+    - Outputs:
+        - cutMatrix (np.ndarray of size (N, 2cut)): The binary matrix for the cut on the left.
     """
     sh = binaryMatrix.shape
-    assert sh[1] == 2*sh[0], "shape of array must be (N, 2N)"
+    assert sh[1] == 2 * sh[0], "shape of array must be (N, 2N)"
     assert cut < sh[0], "cut must be less than N"
     N = len(binaryMatrix)
-    cutMatrix = np.zeros((N, 2*cut))
-    cutMatrix[:,:cut] = binaryMatrix[:,:cut]
-    cutMatrix[:,cut:] = binaryMatrix[:,N:N+cut]
-    return cutMatrix 
+    cutMatrix = np.zeros((N, 2 * cut))
+    cutMatrix[:, :cut] = binaryMatrix[:, :cut]
+    cutMatrix[:, cut:] = binaryMatrix[:, N : N + cut]
+    return cutMatrix
 
 
 def rows(binMatrix):
@@ -91,20 +94,21 @@ def rows(binMatrix):
     - Inputs:
         - binMatrix (np.ndarray): a binary array of any size.
     - Outputs:
-        - v (np.ndarray): length of array is number of rows of the binary matrix. All entries will be integers.  
+        - v (np.ndarray): length of array is number of rows of the binary matrix. All entries will be integers.
     """
     N = np.shape(binMatrix)[0]
     v = []
     for i in range(0, N):
-         test_list = [int(a) for a in binMatrix[i] ]
-         test_list.reverse()
-         v.append(int("".join(str(x) for x in test_list), 2))
+        test_list = [int(a) for a in binMatrix[i]]
+        test_list.reverse()
+        v.append(int("".join(str(x) for x in test_list), 2))
     return v
+
 
 def gf2_rank(rows):
     """
     - Purpose: Finds rank of a Binary matrix over F2.
-     - Inputs: 
+     - Inputs:
         - rows of Binary matrix are bit strings, expressed as integers.
      - Outputs:
         - an integer, the rank of the matrix.

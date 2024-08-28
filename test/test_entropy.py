@@ -1,15 +1,16 @@
 import numpy as np
 import stim
 from supercliffords.entropy import (
-    sample_stabilisers, 
-    binary_matrix, 
+    sample_stabilisers,
+    binary_matrix,
     convert_signs,
     get_cut_stabilizers,
     rows,
     gf2_rank,
-    compute_entropy
+    compute_entropy,
 )
-from supercliffords.gates import ZH, C3
+from supercliffords.gates import ZH
+
 
 def test_sample_stabilisers():
     s = stim.TableauSimulator()
@@ -23,7 +24,6 @@ def test_sample_stabilisers():
     assert np.allclose(bin_mat[0:3, 3:6], np.zeros((3, 3)))
 
 
-
 def test_convert_signs():
     signs = np.array([1, 1, 0, 1, 0])
     converted_signs = np.array([0, 0, 1, 0, 1])
@@ -31,32 +31,22 @@ def test_convert_signs():
 
 
 def test_get_cut_stabilizers():
-    matrix = np.array([[1, 0, 0, 1, 0, 0],
-                        [0, 1, 0, 0, 1, 0],
-                        [0, 0, 1, 0, 0, 1]])
+    matrix = np.array([[1, 0, 0, 1, 0, 0], [0, 1, 0, 0, 1, 0], [0, 0, 1, 0, 0, 1]])
     cut = 2
     cut_matrix = get_cut_stabilizers(matrix, cut)
-    expected_cut_matrix = np.array([[1, 0, 1, 0],
-                                    [0, 1, 0, 1],
-                                    [0, 0, 0, 0]])
+    expected_cut_matrix = np.array([[1, 0, 1, 0], [0, 1, 0, 1], [0, 0, 0, 0]])
     assert np.allclose(cut_matrix, expected_cut_matrix)
 
 
 def test_rows():
-    matrix = np.array([[1, 0, 1, 0],
-                        [0, 1, 0, 1],
-                        [0, 0, 0, 0]])
+    matrix = np.array([[1, 0, 1, 0], [0, 1, 0, 1], [0, 0, 0, 0]])
     print(rows(matrix))
     assert np.allclose(rows(matrix), [5, 10, 0])
-    
-    matrix = np.array([[1, 0, 1, 0],
-                        [0, 1, 0, 1],
-                        [0, 0, 1, 0]])
+
+    matrix = np.array([[1, 0, 1, 0], [0, 1, 0, 1], [0, 0, 1, 0]])
     assert np.allclose(rows(matrix), [5, 10, 4])
-    
-    matrix = np.array([[1, 0, 0, 0],
-                        [0, 1, 0, 0],
-                        [0, 0, 1, 0]])
+
+    matrix = np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0]])
     assert np.allclose(rows(matrix), [1, 2, 4])
 
 
@@ -66,8 +56,9 @@ def test_gf2_rank():
     assert gf2_rank([0, 0, 0]) == 0
     assert gf2_rank([1, 2, 4]) == 3
 
+
 def test_compute_entropy():
-    #bell pair test.
+    # bell pair test.
     s = stim.TableauSimulator()
     c = stim.Circuit()
     c.append_operation("H", [0])
@@ -75,7 +66,7 @@ def test_compute_entropy():
     s.do(c)
     assert compute_entropy(s, 1) == 1
 
-    #product state test.
+    # product state test.
     sprod = stim.TableauSimulator()
     c = stim.Circuit()
     c.append_operation("H", [0])
@@ -83,7 +74,7 @@ def test_compute_entropy():
     sprod.do(c)
     assert compute_entropy(sprod, 1) == 0
 
-    #GHZ test.
+    # GHZ test.
     sghz = stim.TableauSimulator()
     c = stim.Circuit()
     c.append_operation("H", [0])

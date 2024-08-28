@@ -1,4 +1,5 @@
 """Module for defining super-clifford circuits."""
+
 import numpy as np
 import stim
 from supercliffords.steps import (
@@ -12,20 +13,21 @@ from supercliffords.entropy import compute_entropy
 from supercliffords.otoc import compute_otoc
 
 
-class Circuit():
+class Circuit:
     """
     A super-clifford circuit.
     params:
         N (int): The number of qubits in the circuit.
         steps (supercliffords.StepSequence): The steps of the circuit.
     """
+
     def __init__(self, N, steps):
         """
         Initialize the circuit.
         """
         self.N = N
         self.steps = steps
-    
+
     def compute_entropy(self, t, cut, res, rep):
         """
         Compute the entropy of the circuit.
@@ -42,7 +44,7 @@ class Circuit():
         S = np.zeros(t // res)
         for i in range(t // res):
             ts[i] = i * res
-        
+
         for _ in range(rep):
             s = stim.TableauSimulator()
             for stepcount in range(0, t):
@@ -50,7 +52,7 @@ class Circuit():
                 if stepcount % res == 0:
                     S[stepcount // res] += compute_entropy(s, cut) / rep
         return S, ts
-    
+
     def compute_otoc(self, t, res, rep, op):
         """
         Compute the out-of-time-ordered correlator of the circuit.
@@ -68,7 +70,7 @@ class Circuit():
         f = np.zeros(t // res)
         for i in range(t // res):
             ts[i] = i * res
-        
+
         for _ in range(rep):
             s = stim.TableauSimulator()
             for stepcount in range(0, t):
@@ -92,12 +94,15 @@ class ThreeQuarterCircuit(Circuit):
         """
         Initialize the circuit.
         """
-        steps = StepSequence(N, [
-            IdStep(N),
-            ThreeQuarterStep(N, slow),
-        ])
+        steps = StepSequence(
+            N,
+            [
+                IdStep(N),
+                ThreeQuarterStep(N, slow),
+            ],
+        )
         super().__init__(N, steps)
-    
+
 
 class AlternatingCircuit(Circuit):
     """
@@ -113,15 +118,12 @@ class AlternatingCircuit(Circuit):
         """
         Initialize the circuit.
         """
-        steps = StepSequence(N, [
-            IdStep(N),
-            AlternatingEven(N, slow),
-            AlternatingOdd(N, slow),
-        ])
+        steps = StepSequence(
+            N,
+            [
+                IdStep(N),
+                AlternatingEven(N, slow),
+                AlternatingOdd(N, slow),
+            ],
+        )
         super().__init__(N, steps)
-
-
-
-
-
-

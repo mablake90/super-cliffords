@@ -1,11 +1,12 @@
 import numpy as np
 import stim
 from supercliffords.gates import C3, ZH
-from utils import T, C3_123, X, I, HXY, XXX
+from utils import T, C3_123, X, Id, HXY, XXX
+
 
 def test_C3():
     s = stim.TableauSimulator()
-    s.do(C3(0,1,2))
+    s.do(C3(0, 1, 2))
     z1 = stim.PauliString("ZII")
     z2 = stim.PauliString("IZI")
     z3 = stim.PauliString("IIZ")
@@ -13,17 +14,23 @@ def test_C3():
     x2 = stim.PauliString("IXI")
     x3 = stim.PauliString("IIX")
     obs = [z1, z2, z3, x1, x2, x3]
-    z1u = np.kron(np.kron(X, I), I)
-    z2u = np.kron(np.kron(I, X), I)
-    z3u = np.kron(np.kron(I, I), X)
-    x1u = np.kron(np.kron(HXY, I), I)
-    x2u = np.kron(np.kron(I, HXY), I)
-    x3u = np.kron(np.kron(I, I), HXY)
+    z1u = np.kron(np.kron(X, Id), Id)
+    z2u = np.kron(np.kron(Id, X), Id)
+    z3u = np.kron(np.kron(Id, Id), X)
+    x1u = np.kron(np.kron(HXY, Id), Id)
+    x2u = np.kron(np.kron(Id, HXY), Id)
+    x3u = np.kron(np.kron(Id, Id), HXY)
     obsu = [z1u, z2u, z3u, x1u, x2u, x3u]
     ket0 = C3_123.conjugate().transpose() @ XXX @ C3_123
     for ob, obu in zip(obs, obsu):
         res = s.peek_observable_expectation(ob)
-        resu = 1/8 * np.trace(ket0.conjugate().transpose() @ obu.conjugate().transpose() @ ket0 @ obu).item()
+        resu = (
+            1
+            / 8
+            * np.trace(
+                ket0.conjugate().transpose() @ obu.conjugate().transpose() @ ket0 @ obu
+            ).item()
+        )
         assert np.isclose(res, resu)
 
 
@@ -41,11 +48,12 @@ def test_ZH():
         print(ob)
         print(obu)
         res = s.peek_observable_expectation(ob)
-        resu = 1/2 * np.trace(ket0.conjugate().transpose() @ obu.conjugate().transpose() @ ket0 @ obu).item()
+        resu = (
+            1
+            / 2
+            * np.trace(
+                ket0.conjugate().transpose() @ obu.conjugate().transpose() @ ket0 @ obu
+            ).item()
+        )
         print(res, resu)
         assert np.isclose(res, resu)
-
-
-    
-
-    
