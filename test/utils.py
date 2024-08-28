@@ -2,13 +2,6 @@ import numpy as np
 import math
 
 
-"""
-Purpose of code is to run a test of the OTOC code. We will test it by constructing complicated random circuits on three qubits, we can then compute the OTOC directly as well as using the stabilizer formalism (as we use in OTOC.py). The figures generated in these two ways should match exactly.
-"""
-
-"""
-First, create the operators we need as matrices on the underlying Hilbert space.
-"""
 X = np.array([[0,1],[1,0]])
 
 I = np.array([[1,0],[0,1]])

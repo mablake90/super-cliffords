@@ -62,21 +62,23 @@ class IdStep(Step):
         return s
 
 
-class ThreeQuarterCircuit(Step):
+class ThreeQuarterStep(Step):
     """
     Circuit that splits the qubits into 4 and applies C3 to 3/4 of the qubits
     being acted on, and T to the remaining qubits.
     """
-    def __init__(self, N):
+    def __init__(self, N, slow):
         """
         Initialize the step.
         """
         super().__init__(N, when='always')
+        self.slow = slow
     
-    def apply(self, s, slow, step_count):
+    def apply(self, s, step_count):
         """
         Apply the step.
         """
+        slow = self.slow
         if self.validate(step_count):
             r = [i for i in range(self.N-1)] #Randomly chooses which qubits to act on with the gates.
             np.random.shuffle(r)
@@ -99,16 +101,18 @@ class AlternatingEven(Step):
     Circuit that acts with T on all qubits it acts on on even steps,
     and C3 on all qubits it acts on on odd steps.
     """
-    def __init__(self, N):
+    def __init__(self, N, slow):
         """
         Initialize the step.
         """
         super().__init__(N, when='even')
+        self.slow = slow
     
-    def apply(self, s, slow, step_count):
+    def apply(self, s, step_count):
         """
         Apply the step.
         """
+        slow = self.slow
         if self.validate(step_count):
             r = [i for i in range(self.N-1)] #Randomly chooses which qubits to act on with the gates.
             np.random.shuffle(r)
@@ -122,16 +126,18 @@ class AlternatingOdd(Step):
     Circuit that acts with T on all qubits it acts on on odd steps,
     and C3 on all qubits it acts on on even steps.
     """
-    def __init__(self, N):
+    def __init__(self, N, slow):
         """
         Initialize the step.
         """
         super().__init__(N, when='odd')
+        self.slow = slow
     
-    def apply(self, s, slow, step_count):
+    def apply(self, s, step_count):
         """
         Apply the step.
         """
+        slow = self.slow
         if self.validate(step_count):
             r = [i for i in range(self.N-1)] #Randomly chooses which qubits to act on with the gates.
             np.random.shuffle(r)
@@ -140,4 +146,24 @@ class AlternatingOdd(Step):
             s.do(C3(r[0], r[third], r[2*third]))
             for i in range(third):
                 s.do(C3(r[i], r[2*i], r[3*third]))
+        return s
+
+
+class StepSequence():
+    """
+    A sequence of steps in a super-clifford circuit.
+    """
+    def __init__(self, N, steps):
+        """
+        Initialize the sequence.
+        """
+        self.N = N
+        self.steps = steps
+
+    def apply(self, s, step_count):
+        """
+        Apply the sequence of steps.
+        """
+        for step in self.steps:
+            s = step.apply(s, step_count)
         return s

@@ -3,7 +3,7 @@ import numpy as np
 import supercliffords.gates as gates
 import matplotlib.pyplot as plt
 import time
-import supercliffords.circuits as circuits
+import supercliffords.circuits2 as circuits2
 
 
 """
@@ -18,7 +18,7 @@ def sample_stabilisers(s):
     -Inputs:
          - s (stim.circuit): Any circuit you like which you wish to simulate.
     -Outputs:
-         - zs2 (array): The result of conjugating the Z generators by the given stim circuit.     
+         - zs2 (np.ndarray): The result of conjugating the Z generators by the given stim circuit.     
     """
     tableau: stim.Tableau = s.current_inverse_tableau() ** -1
     n = len(tableau)
@@ -31,9 +31,9 @@ def binary_matrix(zStabilizers):
     """
         - Purpose: Construct the binary matrix representing the stabilizer states.
         - Inputs:
-            - zStabilizers (array): The result of conjugating the Z generators on the initial state.
+            - zStabilizers (np.ndarray): The result of conjugating the Z generators on the initial state.
         Outputs:
-            - binaryMatrix (array of size (N, 2N)): An array that describes the location of the stabilizers in the tableau representation.
+            - binaryMatrix (np.ndarray of size (N, 2N)): An array that describes the location of the stabilizers in the tableau representation.
     """
     N = len(zStabilizers)
     binaryMatrix = np.zeros((N,2*N))
@@ -54,6 +54,13 @@ def binary_matrix(zStabilizers):
     return binaryMatrix
 
 def convert_signs(signs):
+    """
+    Purpose: Convert signs into binary format.
+    Inputs:
+        - signs (np.ndarray): The signs of the stabilizer states.
+    Outputs:
+        - signs (np.ndarray): The signs of the stabilizer states in binary format.
+    """
     n = np.size(signs)
     for r in range(n):    
         if (signs[r] == 1):
@@ -62,17 +69,18 @@ def convert_signs(signs):
             signs[r] = 1
     return signs
 
-
-
-def getCutStabilizers(binaryMatrix, cut):
+def get_cut_stabilizers(binaryMatrix, cut):
     """
         - Purpose: Return only the part of the binary matrix that corresponds to the qubits we want to consider for a bipartition.
         - Inputs:
-            - binaryMatrix (array of size (N, 2N)): The binary matrix for the stabilizer generators.
+            - binaryMatrix (np.ndarray of size (N, 2N)): The binary matrix for the stabilizer generators.
             - cut (integer): Location for the cut.
         - Outputs:
-            - cutMatrix (array of size (N, 2cut)): The binary matrix for the cut on the left.
+            - cutMatrix (np.ndarray of size (N, 2cut)): The binary matrix for the cut on the left.
     """
+    sh = binaryMatrix.shape
+    assert sh[1] == 2*sh[0], "shape of array must be (N, 2N)"
+    assert cut < sh[0], "cut must be less than N"
     N = len(binaryMatrix)
     cutMatrix = np.zeros((N, 2*cut))
     cutMatrix[:,:cut] = binaryMatrix[:,:cut]
@@ -82,11 +90,12 @@ def getCutStabilizers(binaryMatrix, cut):
 
 def rows(binMatrix):
     """
-    - Purpose: Take a binary matrix and convert it into a list of integers, corresponding to the rows of the binary matrix expressed as integers.
+    - Purpose: Take a binary matrix and convert it into a list of integers, corresponding to the rows of the binary matrix expressed as integers
+    conversion method: bigendian.
     - Inputs:
-        - binMatrix: a binary matrix of any size.
+        - binMatrix (np.ndarray): a binary array of any size.
     - Outputs:
-        - v (array): length of array is number of rows of the binary matrix. All entries will be integers.  
+        - v (np.ndarray): length of array is number of rows of the binary matrix. All entries will be integers.  
     """
     N = np.shape(binMatrix)[0]
     v = []
@@ -95,11 +104,6 @@ def rows(binMatrix):
          test_list.reverse()
          v.append(int("".join(str(x) for x in test_list), 2))
     return v
-
-
-        
-    
-
 
 def gf2_rank(rows):
     """
@@ -121,8 +125,21 @@ def gf2_rank(rows):
     return rank
 
 
-
-
+def compute_entropy(s: stim.Circuit, cut: int):
+    """
+    - Purpose: Compute the entropy of a circuit.
+    - Inputs:
+        - s (stim.Circuit): The circuit you wish to compute the entropy of.
+        - cut (integer): The cut across which to compute the entropy.
+    - Outputs:
+        - S (float): The entropy of the circuit.
+    """
+    zs2 = sample_stabilisers(s)
+    mat = binary_matrix(zs2)
+    b2 = get_cut_stabilizers(mat, cut)
+    b3 = rows(b2)
+    S = gf2_rank(b3.copy()) - cut
+    return S
 
     
 def main():
@@ -154,11 +171,11 @@ def main():
 
     N = 120
     T = 100
-    rep = 10
-    res = 2
+    rep = 1
+    res = 10
     cut = int(N/3)
     slow = 1
-    v, w = circuits.runLocInt(N, T, rep, res, slow, cut) #Circuit with nearest neighbour interactions.
+    v, w = circuits2.runLocInt(N, T, rep, res, slow, cut) #Circuit with nearest neighbour interactions.
 #    v, w = circuits.runFS3_Np(N, T, rep, res, slow, cut) #Circuit with all to all interactions.
     
     totTime = (time.time() - startTime)
