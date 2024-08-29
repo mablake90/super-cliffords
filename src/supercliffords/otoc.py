@@ -149,7 +149,7 @@ def small_zs(bin_array, starting_row_index, N):
     return small_zs
 
 
-def compute_otoc(s, N, op):
+def compute_otoc(s, N, op_tableau):
     """
     Purpose: Compute the OTOC of a given circuit.
     Inputs:
@@ -159,9 +159,8 @@ def compute_otoc(s, N, op):
          - otoc (float) - the out-of-time-order correlator.
     """
     tableau1: stim.Tableau = s.current_inverse_tableau() ** -1
-    tableau2: stim.Tableau = op.current_inverse_tableau() ** -1
     tableau3: stim.Tableau = s.current_inverse_tableau()
-    tableau_tot: stim.Tableau = (tableau3 * tableau2) * tableau1
+    tableau_tot: stim.Tableau = (tableau3 * op_tableau) * tableau1
     n = len(tableau_tot)
     zs = [tableau_tot.z_output(k) for k in range(n)]
     zs_array = np.array(zs)
