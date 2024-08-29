@@ -1,5 +1,6 @@
 """Module for defining super-clifford circuits."""
 
+import os
 import numpy as np
 import stim
 from supercliffords.steps import (
@@ -44,6 +45,7 @@ class Circuit:
             ts (np.array): Timesteps at which the operator entanglement was
             computed.
         """
+        np.random.seed(int.from_bytes(os.urandom(4), "big"))
         ts = np.zeros(t // res)
         S = np.zeros(t // res)
         for i in range(t // res):
@@ -102,6 +104,7 @@ class Circuit:
             ts (np.array): Timesteps at which the otoc was
             computed.
         """
+        np.random.seed(int.from_bytes(os.urandom(4), "big"))
         if isinstance(op, stim.TableauSimulator):
             op = op.current_inverse_tableau() ** -1
         elif not isinstance(op, stim.Tableau):
