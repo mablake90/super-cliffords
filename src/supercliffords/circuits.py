@@ -9,9 +9,10 @@ from supercliffords.steps import (
     AlternatingEven,
     AlternatingOdd,
     StepSequence,
+    initial_state,
 )
 from supercliffords.entropy import compute_entropy
-from supercliffords.otoc import compute_otoc
+from supercliffords.otoc import compute_otoc, prepare_op_string
 from multiprocessing import Pool
 
 
@@ -89,7 +90,7 @@ class Circuit:
                 S += result[0] / n_jobs
         return S, ts
 
-    def compute_otoc(self, t, res, rep, op):
+    def compute_otoc(self, t, res, rep, op, op_string=None):
         """
         Compute the out-of-time-ordered correlator of the circuit.
         params:
@@ -112,6 +113,8 @@ class Circuit:
                 "op must be a stim.TableauSimulator or stim.Tableau"
             )
 
+        op_string = prepare_op_string(op_string, self.N)
+
         ts = np.zeros(t // res)
         f = np.zeros(t // res)
         for i in range(t // res):
@@ -120,12 +123,15 @@ class Circuit:
         for _ in range(rep):
             s = stim.TableauSimulator()
             for stepcount in range(0, t):
-                s = self.steps.apply(s, stepcount)
+                if stepcount == 0:
+                    s = initial_state(s, self.N)
+                else:
+                    s = self.steps.apply(s, stepcount)
                 if stepcount % res == 0:
                     f[stepcount // res] += compute_otoc(s, self.N, op) / rep
         return f, ts
 
-    def compute_otoc_parallel(self, t, res, rep, op, n_jobs):
+    def compute_otoc_parallel(self, t, res, rep, op, n_jobs, op_string=None):
         """
         Distribute the calculation of the out-of-time-ordered correlator over
         multiple cores.
@@ -153,7 +159,10 @@ class Circuit:
         reps_per_job = rep // n_jobs
 
         op_tableau: stim.Tableau = op.current_inverse_tableau() ** -1
-        args = [(t, res, reps_per_job, op_tableau) for _ in range(n_jobs)]
+        args = [
+            (t, res, reps_per_job, op_tableau, op_string)
+            for _ in range(n_jobs)
+        ]
         with Pool(n_jobs) as p:
             results = p.starmap(self.compute_otoc, args)
             for result in results:

@@ -1,6 +1,7 @@
 """Module for defining the steps of a super-cliffor circuit."""
 
 from abc import ABC, abstractmethod
+from typing import Counter
 import numpy as np
 import stim
 from supercliffords.gates import C3, ZH
@@ -190,3 +191,18 @@ class StepSequence:
         for step in self.steps:
             s = step.apply(s, step_count)
         return s
+
+
+def initial_state(op_string, s):
+    counter = Counter(op_string)
+    assert set(counter.keys()) <= set(["X", "Y"])
+    N = len(op_string)
+    c = stim.Circuit()
+    c.append_operation("I", [N - 1])
+
+    for i, letter in enumerate(op_string):
+        if letter == "Y":
+            c.append_operation("X", [i])
+
+    s.do(c)
+    return s
