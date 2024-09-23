@@ -198,11 +198,12 @@ def op(N):
     c.append_operation("I", [0])
     s.do(c)
     s.do(gates.C3(0, 1, 2))
+    st = s.current_inverse_tableau() ** -1
 
     right_dims = 2 ** (N - 3)
     V0 = np.kron(C3_123, np.eye(right_dims))
 
-    return s, V0
+    return st, V0
 
 
 def otoc_operator(U, W0, V0):

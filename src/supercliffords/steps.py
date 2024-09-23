@@ -1,7 +1,7 @@
 """Module for defining the steps of a super-cliffor circuit."""
 
 from abc import ABC, abstractmethod
-from typing import Counter
+from collections import Counter
 import numpy as np
 import stim
 from supercliffords.gates import C3, ZH
@@ -71,6 +71,57 @@ class IdStep(Step):
         if self.validate(step_count):
             c = stim.Circuit()
             c.append_operation("I", [self.N - 1])
+            s.do(c)
+        return s
+
+
+class Initialize(Step):
+    """
+    Initialize the operator to an arbitrary product of X and Y.
+    """
+
+    def __init__(self, N, op_string=None):
+        """
+        Initialize the step.
+        """
+        super().__init__(N, when="first")
+        self.op_string = self.prepare_op_string(op_string)
+
+    def prepare_op_string(self, op_string):
+        """
+        Purpose: Prepare the operator string for the OTOC calculation.
+        Inputs:
+            - op_string (str or None) - a string of length N, containing only "X" and "Y" or None.
+        Outputs:
+            - op_string (str) - a string of length N, containing only "X" and "Y".
+        """
+        N = self.N
+        if op_string is None:
+            op_string = "X" * N
+        if not isinstance(op_string, str):
+            raise ValueError(
+                "op_string must be a string, type is", type(op_string)
+            )
+        counter = Counter(op_string)
+        assert set(counter.keys()) <= set(["X", "Y"])
+        return op_string
+
+    def apply(self, s, step_count):
+        """
+        Apply the step.
+        """
+        if self.validate(step_count):
+            op_string = self.op_string
+            counter = Counter(op_string)
+            assert set(counter.keys()) <= set(["X", "Y"])
+            N = len(op_string)
+            c = stim.Circuit()
+            c.append_operation("I", [N - 1])
+
+            for i, letter in enumerate(op_string):
+                if letter == "Y":
+                    c.append_operation("X", [i])
+
             s.do(c)
         return s
 
@@ -191,18 +242,3 @@ class StepSequence:
         for step in self.steps:
             s = step.apply(s, step_count)
         return s
-
-
-def initial_state(op_string, s):
-    counter = Counter(op_string)
-    assert set(counter.keys()) <= set(["X", "Y"])
-    N = len(op_string)
-    c = stim.Circuit()
-    c.append_operation("I", [N - 1])
-
-    for i, letter in enumerate(op_string):
-        if letter == "Y":
-            c.append_operation("X", [i])
-
-    s.do(c)
-    return s

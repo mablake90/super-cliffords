@@ -1,6 +1,7 @@
 import numpy as np
+import pytest
 import stim
-from supercliffords.steps import Step, IdStep
+from supercliffords.steps import Step, IdStep, Initialize
 
 
 class StepT(Step):
@@ -35,3 +36,34 @@ def test_IdStep():
     assert s3.peek_observable_expectation(stim.PauliString("XII")) == 0
     assert s3.peek_observable_expectation(stim.PauliString("IXI")) == 0
     assert s3.peek_observable_expectation(stim.PauliString("IIX")) == 0
+
+
+def test_Initialize():
+    step = Initialize(3)
+    s = stim.TableauSimulator()
+    s3 = step.apply(s, 0)
+    assert s3.peek_observable_expectation(stim.PauliString("ZII")) == 1
+    assert s3.peek_observable_expectation(stim.PauliString("IZI")) == 1
+    assert s3.peek_observable_expectation(stim.PauliString("IIZ")) == 1
+    assert s3.peek_observable_expectation(stim.PauliString("XII")) == 0
+    assert s3.peek_observable_expectation(stim.PauliString("IXI")) == 0
+    assert s3.peek_observable_expectation(stim.PauliString("IIX")) == 0
+
+    step = Initialize(3, "XXY")
+    s3 = step.apply(s, 0)
+    assert s3.peek_observable_expectation(stim.PauliString("ZII")) == 1
+    assert s3.peek_observable_expectation(stim.PauliString("IZI")) == 1
+    assert s3.peek_observable_expectation(stim.PauliString("IIZ")) == -1
+
+    s = stim.TableauSimulator()
+    step = Initialize(3, "XYY")
+    s3 = step.apply(s, 0)
+    assert s3.peek_observable_expectation(stim.PauliString("ZII")) == 1
+    assert s3.peek_observable_expectation(stim.PauliString("IZI")) == -1
+    assert s3.peek_observable_expectation(stim.PauliString("IIZ")) == -1
+
+    with pytest.raises(Exception):
+        step = Initialize(3, "ZXY")
+
+    with pytest.raises(Exception):
+        step = Initialize(3, "IXY")

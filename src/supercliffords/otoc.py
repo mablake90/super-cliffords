@@ -149,22 +149,6 @@ def small_zs(bin_array, starting_row_index, N):
     return small_zs
 
 
-def prepare_op_string(op_string, N):
-    """
-    Purpose: Prepare the operator string for the OTOC calculation.
-    Inputs:
-         - op_string (str or None) - a string of length N, containing only "X" and "Y".
-         - N (int) - an integer, number of qubits.
-    Outputs:
-         - op_tableau (stim.TableauSimulator) - the operator in tableau form.
-    """
-    if op_string is None:
-        op_string = "X" * N
-    if isinstance(op_string, str):
-        raise ValueError("op_string must be a string")
-    return op_string
-
-
 def compute_otoc(s, N, op_tableau):
     """
     Purpose: Compute the OTOC of a given circuit.
