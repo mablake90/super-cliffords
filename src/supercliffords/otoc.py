@@ -154,7 +154,9 @@ def compute_otoc(s, N, op_tableau):
     Purpose: Compute the OTOC of a given circuit.
     Inputs:
          - s (stim.TableauSimulator) - the circuit.
-         - Op (stim.TableauSimulator) - the operator.
+         - op_tableau (stim.Tableau) - the operator.
+         - N (int) - the number of qubits.
+
     Outputs:
          - otoc (float) - the out-of-time-order correlator.
     """

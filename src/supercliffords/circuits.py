@@ -5,6 +5,7 @@ import numpy as np
 import stim
 from supercliffords.steps import (
     IdStep,
+    Initialize,
     ThreeQuarterStep,
     AlternatingEven,
     AlternatingOdd,
@@ -171,14 +172,14 @@ class ThreeQuarterCircuit(Circuit):
         slow (int): The proportion of qubits to act on at each timestep.
     """
 
-    def __init__(self, N, slow):
+    def __init__(self, N, slow, op_string=None):
         """
         Initialize the circuit.
         """
         steps = StepSequence(
             N,
             [
-                IdStep(N),
+                Initialize(N, op_string),
                 ThreeQuarterStep(N, slow),
             ],
         )
