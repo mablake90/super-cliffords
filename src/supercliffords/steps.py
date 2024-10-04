@@ -146,17 +146,22 @@ class ThreeQuarterStep(Step):
         slow = self.slow
         if self.validate(step_count):
             r = [
-                i for i in range(self.N - 1)
+                i for i in range(self.N)
             ]  # Randomly chooses which qubits to act on with the gates.
             np.random.shuffle(r)
-            acted_on = int(self.N / slow - 1)
-            quarter = int(self.N / (slow * 4) - 1)
+            acted_on = self.N // slow
+            quarter = acted_on // 4
+            if quarter == 0:
+                raise ValueError("Not enough qubits are being acted on!")
+
             for i in range(3 * quarter, acted_on):  # Apply ZH
                 s.do(ZH(r[i]))
 
-            for i in range(1, quarter):  # Apply C3
-                s.do(C3(r[i], r[2 * i], r[3 * i]))
             s.do(C3(r[0], r[quarter], r[2 * quarter]))
+
+            for i in range(1, quarter):  # Apply C3
+                s.do(C3(r[i], r[quarter + i], r[2 * quarter + i]))
+
             c = stim.Circuit()
             c.append_operation("I", [self.N - 1])
             s.do(c)
@@ -186,7 +191,7 @@ class AlternatingEven(Step):
                 i for i in range(self.N - 1)
             ]  # Randomly chooses which qubits to act on with the gates.
             np.random.shuffle(r)
-            acted_on = int(self.N / slow - 1)
+            acted_on = self.N // slow
             for i in range(acted_on):
                 s.do(ZH(r[i]))
         return s
@@ -212,14 +217,15 @@ class AlternatingOdd(Step):
         slow = self.slow
         if self.validate(step_count):
             r = [
-                i for i in range(self.N - 1)
+                i for i in range(self.N)
             ]  # Randomly chooses which qubits to act on with the gates.
             np.random.shuffle(r)
-            acted_on = int(self.N / slow - 1)
-            third = acted_on / 3
+            acted_on = int(self.N / slow)
+            third = acted_on // 3
+
             s.do(C3(r[0], r[third], r[2 * third]))
-            for i in range(third):
-                s.do(C3(r[i], r[2 * i], r[3 * third]))
+            for i in range(1, third):
+                s.do(C3(r[i], r[third + i], r[2 * third + i]))
         return s
 
 
