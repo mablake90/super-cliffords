@@ -1,6 +1,21 @@
 
 # super-cliffords
 
+
+- [super-cliffords](#super-cliffords)
+  - [Introduction](#introduction)
+  - [Installation](#installation)
+    - [Clone repository](#clone-repository)
+    - [Environment](#environment)
+    - [Install](#install)
+    - [Test](#test)
+  - [Background](#background)
+  - [Usage](#usage)
+  - [Data](#data)
+  - [Citation](#citation)
+
+## Introduction
+
 This repository contains a module that can be used to compute operator entanglement entropy and out-of-time ordered correlators of super-stabilizer circuits.  This was developed as part of a research project carried out at the University of Bristol, by Anthony Thompson, Mike Blake, and Noah Linden.
 
 The simulation techniques used are those introduced in [arXiv:2002.12824[quant-ph]](https://arxiv.org/abs/2002.12824). All code is written in python, and the simulation of stabilizer circuits is done using stim by Craig Gidney, a Clifford circuit simulator with python interface. This was introduced in [arXiv:2103.02202 [quant-ph]](https://arxiv.org/abs/2103.02202).
