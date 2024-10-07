@@ -57,11 +57,11 @@ This module includes functions that allow these quantities to be computed for su
 This module comes with two examples of circuits built from the allowed super-Clifford gates. See the directory `/examples` for Jupyter notebooks with multiple examples and explanations on how to use these pre-built circuits and how to compute the operator entanglement entropy and out-of-time ordered correlators for these circuits. It is also possible to build new circuits from the same gates and to simulate these using the functions provided here.
 
 ## Data
-The directory `/data`  contains all the data that is needed to reproduce the results that appeared in <span style="color:red"> cite <\span>. The directory /plotters includes Jupyter notebooks with explanations on how to plot all the figures from that paper. All data presented here was computed using the circuit which was explained in <span style="color:red"> cite <\span> and which is referred to here as `ThreeQuarterCircuit`.
+The directory `/data`  contains all the data that is needed to reproduce the results that appeared in $\color{red}{\text{cite}}$ The directory /plotters includes Jupyter notebooks with explanations on how to plot all the figures from that paper. All data presented here was computed using the circuit which was explained in $\color{red}{\text{cite}}$ and which is referred to here as `ThreeQuarterCircuit`.
 
 ### Details of data
 #### Entropy Data
-The directory entropy data contains $\color{red}{Clarify what this will contain.}$
+The directory entropy data contains $\color{red}{\text{Clarify what this will contain.}}$
 
  #### OTOC Data
  The directory `/data/otoc_data` contains all the data required to reproduce Figures 4 and 5 from the paper. The left panel of Figure 4, requires the files `/data/otoc_data/fig4/fig4_left1.npz` and `/data/otoc_data/fig4/fig4_left2.npz`. These contain data from simulations of the out-of-time ordered correlator, on a system of $120$ qubits, averaged over $1000$ realisations of the circuit. The operator $V(0) = C3$ and the initial operators $W(0)$ were of the form:
