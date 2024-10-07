@@ -61,7 +61,7 @@ The directory `/data`  contains all the data that is needed to reproduce the res
 
 ### Details of data
 #### Entropy Data
-The directory entropy data contains <span style="color:red"> Clarify what exactly this folder will contain <\span>
+The directory entropy data contains $\color{red}{Clarify what this will contain.}$
 
  #### OTOC Data
  The directory `/data/otoc_data` contains all the data required to reproduce Figures 4 and 5 from the paper. The left panel of Figure 4, requires the files `/data/otoc_data/fig4/fig4_left1.npz` and `/data/otoc_data/fig4/fig4_left2.npz`. These contain data from simulations of the out-of-time ordered correlator, on a system of $120$ qubits, averaged over $1000$ realisations of the circuit. The operator $V(0) = C3$ and the initial operators $W(0)$ were of the form:
