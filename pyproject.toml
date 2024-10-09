@@ -9,7 +9,7 @@ readme = "README.md"
 dynamic = ["description"]
 version = "0.1"
 dependencies = [
-    "stim >= 1.0"
+    "stim >= 1.0",
 ]
 
 [tool.ruff]
