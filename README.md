@@ -47,7 +47,7 @@ To check that this has been installed correctly, run the unit tests:
 
 ## Background
 
-Super-clifford circuits are circuits that act as Clifford circuits in Operator space. Concretely, we consider the a system of qubits and let $S$ denote the subspace of operator space spanned by all strings of Pauli gates $\{X, Y\}$: this is a $2^N$ dimensional (Real) Hilbert space. It has previously been [demonstrated](https://arxiv.org/abs/2002.12824) that the Unitary dynamics obtained from three gates (and aribtrary compositions of them) generates a dynamics in the subspace $S$ of operator space that can be efficiently simulated.
+Super-clifford circuits are circuits that act as Clifford circuits in Operator space. Concretely, we consider a system of $N$ qubits and let $S$ denote the subspace of operator space spanned by all strings of Pauli gates $\{X, Y\}$: this is a $2^N$ dimensional (Real) Hilbert space. It has previously been demonstrated that the Unitary dynamics obtained from three gates (and aribtrary compositions of them) generates a dynamics in the subspace $S$ of operator space that can be efficiently simulated. For more details on the specific gates and how they are simulated please see [this](https://arxiv.org/abs/2002.12824) reference.
 
 Two probes of operator scrambling that can be efficiently simulated using these techniques are operator entanglement entropy, and out-of-time ordered correlators. Recall, the entanglement entropy of a state $\ket{\psi} \in \mathcal{H}$ on some region $A$ is defined as:
 
@@ -65,7 +65,7 @@ $$
 F(t) = \frac{1}{2^N} \mathrm{Tr}(W(t)^\dagger V(0)^\dagger W(t) V(0))
 $$
 
-This module includes functions that allow these quantities to be computed for super-Clifford circuits. Further details on how and why it is possible to simulate these quantities using super-Clifford techniques can be found in [arXiv:2103.02202 [quant-ph]](https://arxiv.org/abs/2103.02202).
+This module includes functions that allow these quantities to be computed for super-Clifford circuits.
 
 
 ## Usage
