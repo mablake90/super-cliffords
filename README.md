@@ -25,7 +25,7 @@ The simulation techniques used are those introduced in [arXiv:2002.12824[quant-p
 
 ### Clone repository
 
-`pip install git+https://github.com/anthonypetertc/super-cliffords`
+`git clone git@github.com:anthonypetertc/super-cliffords.git`
 
 Alternatively, [download](https://github.com/anthonypetertc/super-cliffords/archive/refs/heads/main.zip) the package and unzip it.
 
