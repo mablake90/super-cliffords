@@ -31,7 +31,7 @@ Alternatively, [download](https://github.com/anthonypetertc/super-cliffords/arch
 
 ### Environment
 
-`pip install numpy, pandas, stim, pytest, scipy, matplotlib`
+`pip install numpy pandas stim pytest scipy matplotlib`
 
 ### Install
 
