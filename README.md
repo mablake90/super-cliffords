@@ -12,6 +12,7 @@
   - [Background](#background)
   - [Usage](#usage)
   - [Data](#data)
+  - [Acknowledgements](#acknowledgements)
   - [Citation](#citation)
 
 ## Introduction
@@ -74,6 +75,8 @@ This module comes with two examples of circuits built from the allowed super-Cli
 ## Data
 The directory `/data`  contains all the data that is needed to reproduce the results that appeared in $\color{red}{\text{cite}}$ The directory `/plotters` includes Jupyter notebooks with explanations on how to plot all the figures from that paper as well as detailed explanation on how each of these sets of data was obtained. All data presented here was computed using the circuit which was explained in $\color{red}{\text{cite}}$ and which is referred to here as `ThreeQuarterCircuit`.
 
-## Citation
+## Acknowledgements
+Anthony Thompson acknowledges support from UK Engineering and Physical Sciences Research Council  (EP/SO23607/1). Mike Blake acknowledges support from UK Research and Innovation (UKRI) under the UK government's Horizon Europe guarantee (EP/Y00468X/1).  Noah Linden gratefully acknowledges support from the UK Engineering and Physical Sciences Research Council through grants EP/R043957/1, EP/S005021/1, EP/T001062/1.
 
+## Citation
 $\color{red}{\text{how to cite our paper.}}$
