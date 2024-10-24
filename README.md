@@ -23,7 +23,7 @@ This repository contains a module that can be used to compute operator entanglem
 The simulation techniques used are those introduced in [arXiv:2002.12824[quant-ph]](https://arxiv.org/abs/2002.12824). All code is written in python, and the simulation of stabilizer circuits is done using stim by Craig Gidney, a Clifford circuit simulator with python interface. This was introduced in [arXiv:2103.02202 [quant-ph]](https://arxiv.org/abs/2103.02202).
 
 ### Overview
-The directory `/examples/`contains Jupyter notebooks with clear explanations on how to use this module - you should start there. The directory `/data/` contains all the data needed to reproduce the plots from "Fast Scrambling in Classically Simulable Quantum Circuits.", and the directory `/plotters/` contains Jupyter notebooks with code to reproduce those plots from the data. `/src/` contains the source code, and `/test/` contains unit tests.
+The directory `/examples/`contains Jupyter notebooks with clear explanations on how to use this module. The directory `/data/` contains all the data needed to reproduce the plots from "Fast Scrambling in Classically Simulable Quantum Circuits.", and the directory `/plotters/` contains Jupyter notebooks with code to reproduce those plots from the data. `/src/` contains the source code, and `/test/` contains unit tests.
 
 
 ## Installation
