@@ -1,10 +1,5 @@
 """
 Module with functions used to compute the entropy.
-The command at the bottom of the file allows one to run the circuits and
- compute the entropy.
-
-The function gf2_rank(rows) is taken from the page:
- https://stackoverflow.com/questions/56856378/fast-computation-of-matrix-rank-over-gf2
 """
 
 import stim
@@ -123,6 +118,8 @@ def gf2_rank(rows):
         - rows of Binary matrix are bit strings, expressed as integers.
      - Outputs:
         - an integer, the rank of the matrix.
+    This function is taken from the page:
+    https://stackoverflow.com/questions/56856378/fast-computation-of-matrix-rank-over-gf2
     """
     rank = 0
     while rows:

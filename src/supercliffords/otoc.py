@@ -1,13 +1,10 @@
+"""
+Module with functions used to compute the entropy.
+"""
+
 import stim
 import numpy as np
 import supercliffords.entropy as entropy
-
-"""
-The code in this file allows one to compute the OTOC of certain random
- circuits.
-
-The function row_sum and g are taken directly from [arXiv:quant-ph/0406196].
-"""
 
 
 def ref_binary(A, signs, N):
@@ -76,6 +73,7 @@ def g(x1, z1, x2, z2):
          - x1, z1, x2, z2  in {0, 1} (i.e. four bits).
     Outputs:
          - g in {-1, 0, 1}
+    Function is taken from: [arXiv:quant-ph/0406196].
     """
     if (x1 == 0) and (z1 == 0):
         g = 0
@@ -100,6 +98,7 @@ def row_sum(h, i, rh, ri, N):
     Outputs:
          - rh - a bit.
          The sign of the new row obtained from adding h + i as bitstrings.
+    Function is taken from: [arXiv:quant-ph/0406196].
     """
     k = 0
     for j in range(N):
