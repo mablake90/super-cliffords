@@ -88,6 +88,7 @@ Anthony Thompson acknowledges support from UK Engineering and Physical Sciences 
 
 Bibtex:
 
+```
 @misc{blake2024fastscramblingclassicallysimulable,
       title={Fast Scrambling in Classically Simulable Quantum Circuits},
       author={Mike Blake and Noah Linden and Anthony P. Thompson},
@@ -97,3 +98,4 @@ Bibtex:
       primaryClass={quant-ph},
       url={https://arxiv.org/abs/2410.19614},
 }
+```
