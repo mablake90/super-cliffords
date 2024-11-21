@@ -83,3 +83,19 @@ The directory `/data`  contains all the data that is needed to reproduce the res
 Anthony Thompson acknowledges support from UK Engineering and Physical Sciences Research Council  (EP/SO23607/1). Mike Blake acknowledges support from UK Research and Innovation (UKRI) under the UK government's Horizon Europe guarantee (EP/Y00468X/1).  Noah Linden gratefully acknowledges support from the UK Engineering and Physical Sciences Research Council through grants EP/R043957/1, EP/S005021/1, EP/T001062/1.
 
 ## Citation
+
+[Fast Scrambling in Classically Simulable Quantum Circuits](https://arxiv.org/abs/2410.19614)
+
+Bibtex:
+
+```
+@misc{blake2024fastscramblingclassicallysimulable,
+      title={Fast Scrambling in Classically Simulable Quantum Circuits},
+      author={Mike Blake and Noah Linden and Anthony P. Thompson},
+      year={2024},
+      eprint={2410.19614},
+      archivePrefix={arXiv},
+      primaryClass={quant-ph},
+      url={https://arxiv.org/abs/2410.19614},
+}
+```
