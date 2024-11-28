@@ -4,7 +4,7 @@
 
 [![arXiv](https://img.shields.io/badge/arXiv-2410.19614-b31b1b.svg)](https://arxiv.org/abs/2410.19614)
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
-![Test passing](https://img.shields.io/badge/Tests-passing-brightgreen.svg)
+![Test passing](https://github.com/mablake90/super-cliffords/actions/workflows/python-package.yml/badge.svg)
 
 - [super-cliffords](#super-cliffords)
   - [Introduction](#introduction)
